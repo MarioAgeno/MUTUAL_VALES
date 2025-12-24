@@ -1,0 +1,116 @@
+# vales\apps\maestros\models\cliente_models.py
+from django.db import models
+from django.core.exceptions import ValidationError
+import re
+from datetime import date
+
+from utils.validator.validaciones import validar_cuit
+from .base_gen_models import ModeloBaseGenerico
+from .base_models import (Localidad, Provincia, TipoIva, 
+						  TipoDocumentoIdentidad)
+from .sucursal_models import Sucursal
+from entorno.constantes_base import (
+	ESTATUS_GEN, SEXO, TIPO_PERSONA, SI_NO)
+
+
+class Socio(ModeloBaseGenerico):
+	id_socio = models.AutoField(primary_key=True)
+	estatus_socio = models.BooleanField("Estatus*", default=True, 
+										  choices=ESTATUS_GEN)
+	codigo_socio = models.IntegerField("Código", null=True, blank=True)
+	nombre_socio = models.CharField("Nombre Socio*", max_length=50)
+	domicilio_socio = models.CharField("Domicilio Socio*", 
+										 max_length=50)
+	codigo_postal = models.CharField("Código Postal*", max_length=5,
+                                  null=True, blank=True)
+	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
+									verbose_name="Provincia*",
+          							null=True, blank=True)
+	id_localidad = models.ForeignKey(Localidad, on_delete=models.PROTECT,
+									verbose_name="Localidad*",
+         							null=True, blank=True)
+	tipo_persona = models.CharField("Tipo de Persona*", max_length=1,
+									default="F", 
+									choices=TIPO_PERSONA)
+	id_tipo_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT,
+									verbose_name="Tipo de Iva*")
+	id_tipo_documento_identidad = models.ForeignKey(TipoDocumentoIdentidad, 
+										on_delete=models.PROTECT, 
+										verbose_name="Tipo Doc. Identidad*")
+	cuit = models.IntegerField("Número doc.*", null=True, blank=True)
+	telefono_socio = models.CharField("Teléfono*", max_length=15)
+	telefono2_socio = models.CharField("Teléfono Alternativo", max_length=15, null=True, blank=True)
+	movil_socio = models.CharField("Móvil", max_length=15, null=True, blank=True)
+	email_socio = models.EmailField("Email*", max_length=50)
+	fecha_nacimiento = models.DateField("Fecha Nacimiento", 
+									 null=True, blank=True)
+	fecha_alta = models.DateField("Fecha Alta", default=date.today,
+                               null=True, blank=True)
+	sexo = models.CharField("Sexo*", max_length=1, 
+							default="M", choices=SEXO)
+	id_sucursal = models.ForeignKey(Sucursal, 
+									on_delete=models.CASCADE,
+									null=True, blank=True,
+									verbose_name="Sucursal*")
+	black_list = models.BooleanField("Black List", default=False, 
+										  choices=SI_NO)
+	black_list_motivo = models.CharField("Motivo Black List", max_length=50, 
+										   null=True, blank=True)
+	black_list_usuario = models.CharField("Usuario Black List", 
+										  max_length=20, null=True, blank=True)
+	fecha_baja = models.DateField("Fecha de Baja", null=True, blank=True)
+	
+	class Meta:
+		db_table = 'socio'
+		verbose_name = ('Socio')
+		verbose_name_plural = ('Socios')
+		ordering = ['nombre_socio']
+												
+	def __str__(self):
+		return self.nombre_socio
+	
+	def clean(self):
+		super().clean()
+		
+		#-- Diccionario contenedor de errores.
+		errors = {}
+		
+		#-- Convertir a string los valores de los campos previo a la validación.
+		telefono_str = str(self.telefono_socio) if self.telefono_socio else ''
+		movil_socio_str = str(self.movil_socio) if self.movil_socio else ''
+
+		if getattr(self, 'id_tipo_documento_identidad', None) is not None:
+			nombre_doc = self.id_tipo_documento_identidad.nombre_documento_identidad.lower()
+			if nombre_doc in ('cuit', 'cuil'):
+				try:
+					validar_cuit(self.cuit)
+				except ValidationError as e:
+					#-- Agrego el error al dicciobario errors.
+					errors['cuit'] = e.messages
+		
+		
+		if not self.cuit:
+			errors.update({'cuit': 'Debe indicar un Número de Documento de Identidad.'})
+		
+		if not re.match(r'^\+?\d[\d ]{0,14}$', telefono_str):
+			errors.update({'telefono_socio': 'Debe indicar sólo dígitos numéricos positivos, \
+       			mínimo 1 y máximo 15, el signo + y espacios.'})
+		
+		if movil_socio_str and not re.match(r'^\+?\d[\d ]{0,14}$', movil_socio_str):
+			errors.update({'movil_socio': 'Debe indicar sólo dígitos numéricos positivos, mínimo 1 y máximo 15, el signo +, espacios o vacío.'})
+			
+		if errors:
+			#-- Lanza el conjunto de excepciones.
+			raise ValidationError(errors)
+	
+	@property
+	def cuit_formateado(self):
+		cuit = str(self.cuit)
+		if self.nombre_tipo_documento_identidad.lower() == "cuit":
+			cuit = f"{cuit[:2]}-{cuit[2:-1]}-{cuit[-1:]}"
+		return cuit
+	
+	@property
+	def nombre_tipo_documento_identidad(self):
+		return self.id_tipo_documento_identidad.nombre_documento_identidad
+	
