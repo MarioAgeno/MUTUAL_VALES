@@ -19,8 +19,7 @@ class Socio(ModeloBaseGenerico):
 										  choices=ESTATUS_GEN)
 	codigo_socio = models.IntegerField("Código", null=True, blank=True)
 	nombre_socio = models.CharField("Nombre Socio*", max_length=50)
-	domicilio_socio = models.CharField("Domicilio Socio*", 
-										 max_length=50)
+	domicilio_socio = models.CharField("Domicilio Socio*", max_length=50)
 	codigo_postal = models.CharField("Código Postal*", max_length=5,
                                   null=True, blank=True)
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
@@ -52,6 +51,12 @@ class Socio(ModeloBaseGenerico):
 									on_delete=models.CASCADE,
 									null=True, blank=True,
 									verbose_name="Sucursal*")
+	limite_credito = models.DecimalField("Límite de Crédito", 
+										 max_digits=15, decimal_places=2,
+										 default=0.00)
+	disponible_credito = models.DecimalField("Crédito Disponible", 
+											max_digits=15, decimal_places=2,
+											default=0.00)
 	black_list = models.BooleanField("Black List", default=False, 
 										  choices=SI_NO)
 	black_list_motivo = models.CharField("Motivo Black List", max_length=50, 
@@ -59,7 +64,6 @@ class Socio(ModeloBaseGenerico):
 	black_list_usuario = models.CharField("Usuario Black List", 
 										  max_length=20, null=True, blank=True)
 	fecha_baja = models.DateField("Fecha de Baja", null=True, blank=True)
-	
 	class Meta:
 		db_table = 'socio'
 		verbose_name = ('Socio')
@@ -87,8 +91,7 @@ class Socio(ModeloBaseGenerico):
 				except ValidationError as e:
 					#-- Agrego el error al dicciobario errors.
 					errors['cuit'] = e.messages
-		
-		
+	
 		if not self.cuit:
 			errors.update({'cuit': 'Debe indicar un Número de Documento de Identidad.'})
 		

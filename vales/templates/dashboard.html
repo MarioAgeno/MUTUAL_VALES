@@ -7,7 +7,7 @@
                 <div class="col-xl-1 col-md-3 text-center">
                     <a href="{% url 'comercio_list' %}" class="text-decoration-none" title="Comercios">
                         <div class="p-2 rounded-3 border border-primary hover-shadow" style="--bs-border-opacity: 0.5; height: 60px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-file-invoice-dollar fs-4 text-info"></i>
+                            <i class="fas fa-file-invoice fs-4 text-info"></i>
                         </div>
                     </a>
                 </div>
@@ -16,16 +16,16 @@
                 <div class="col-xl-1 col-md-3 text-center">
                     <a href="{% url 'socio_list' %}" class="text-decoration-none" title="Socios">
                         <div class="p-2 rounded-3 border border-primary hover-shadow" style="--bs-border-opacity: 0.5; height: 60px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-file-signature fs-4 text-warning"></i>
+                            <i class="fas fa-users fs-4 text-warning"></i>
                         </div>
                     </a>
                 </div>
 
-                <!-- Servicios -->
+                <!-- Planes -->
                 <div class="col-xl-1 col-md-3 text-center">
-                    <a href="{% url 'servicio_list' %}" class="text-decoration-none" title="Servicios">
+                    <a href="{% url 'plan_list' %}" class="text-decoration-none" title="Planes">
                         <div class="p-2 rounded-3 border border-primary hover-shadow" style="--bs-border-opacity: 0.5; height: 60px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-hand-holding-usd fs-4 text-success"></i>
+                            <i class="fas fa-bolt fs-4 text-success"></i>
                         </div>
                     </a>
                 </div>
@@ -34,59 +34,7 @@
             {% comment %} Accesos Directos End {% endcomment %}
             
             {% comment %} Módulos Start{% endcomment %}
-            <div class="row mt-0 mb-1">  <!-- Cambiado my-1 a mt-0 mb-1 -->
-                <div class="col-xl-2 col-md-3">
-                    <div class="card bg-primary bg-opacity-25 text-dark mb-3">  <!-- Reducido mb-4 a mb-3 -->
-                        <div class="card-body">Comercios</div>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <a class="small text-blue stretched-link" href="#">Ver Detalles</a>
-                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-md-3">
-                    <div class="card bg-success bg-opacity-25 text-dark mb-3">  <!-- Reducido mb-4 a mb-3 -->
-                        <div class="card-body">Socios</div>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <a class="small text-blue stretched-link" href="#">Ver Detalles</a>
-                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-md-3">
-                    <div class="card bg-primary bg-opacity-25 text-dark mb-3">  <!-- Reducido mb-4 a mb-3 -->
-                        <div class="card-body">Servicios</div>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <a class="small text-blue stretched-link" href="#">Ver Detalles</a>
-                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-md-3">
-                    <div class="card bg-success bg-opacity-25 text-dark mb-3">  <!-- Reducido mb-4 a mb-3 -->
-                        <div class="card-body">Parametros</div>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <a class="small text-blue stretched-link" href="#">Ver Detalles</a>
-                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-2 col-md-3">
-                    <div class="card bg-success bg-opacity-25 text-dark mb-3">  <!-- Reducido mb-4 a mb-3 -->
-                        <div class="card-body">Vales</div>
-                        <div class="card-footer d-flex align-items-center justify-content-between">
-                            <a class="small text-blue stretched-link" href="#">Ver Detalles</a>
-                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             {% comment %} Módulos End{% endcomment %}
-
             
 
             {% comment %} Gráficos Start{% endcomment %}

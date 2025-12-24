@@ -34,15 +34,13 @@ class EmpresaForm(CrudGenericForm):
 			'ingresos_bruto':
 				forms.TextInput(attrs={**formclasstext}),
 			'inicio_actividad': 
-				forms.TextInput(attrs={**formclassdate,
-										'type': 'date' }),
+				forms.TextInput(attrs={**formclassdate,	'type': 'date' }),
 			'cbu':
 				forms.TextInput(attrs={**formclasstext}),
 			'cbu_alias':
 				forms.TextInput(attrs={**formclasstext}),
 			'cbu_vence': 
-				forms.TextInput(attrs={**formclassdate,
-										'type': 'date' }),
+				forms.TextInput(attrs={**formclassdate,	'type': 'date' }),
 			'telefono':
 				forms.TextInput(attrs={**formclasstext}),
 			'email_empresa':

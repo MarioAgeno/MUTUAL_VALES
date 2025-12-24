@@ -1,4 +1,3 @@
-<!-- neumatic\apps\maestros\templates\maestros\valida_form.html -->
 {% extends 'maestro_form.html' %}
 {% load static %}
 <!-- -------------------------------------------------------------------- -->
@@ -39,95 +38,45 @@
 												class="accordion-button py-2 " 
 												type="button" 
 												data-bs-toggle="collapse" 
-												data-bs-target="#Información_del_Punto_de_Venta" 
+												data-bs-target="#Información_Planes_de_Comercios" 
 												aria-expanded="true" 
-												aria-controls="Información_del_Punto_de_Venta">
-												<strong>Información de Validación</strong>
+												aria-controls="Información_Planes_de_Comercios">
+												<strong>Información Planes de Comercios</strong>
 											</button>
 										</h2>
 										<div class="accordion-collapse collapse show"
-											id="Información_del_Punto_de_Venta">
+											id="Información_Planes_de_Comercios">
 											<div class="accordion-body bg-secondary-subtle">
+												
 												<div class="row">
+													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
-															{{ form.estatus_valida.label }}
+															{{ form.estatus_plan_comercio.label }}
 														</label>
-														{{ form.estatus_valida }}
+														{{ form.estatus_plan_comercio }}
 													</div>
-
+												</div>										
+												<div class="row">
+													
 													<div class="col-md-4">
 														<label class="form-label text-primary mb-0">
-															{{ form.id_sucursal.label }}
+															{{ form.id_plan.label }}
 														</label>
-														{{ form.id_sucursal }}
+														{{ form.id_plan }}
 													</div>
 													
-													<div class="col-md-2">
+													<div class="col-md-4">
 														<label class="form-label text-primary mb-0">
-															{{ form.fecha_valida.label }}
+															{{ form.id_comercio.label }}
 														</label>
-														{{ form.fecha_valida }}
-													</div>
-
-													<div class="col-md-1">
-														<label class="form-label text-primary mb-0">
-															{{ form.hora_valida.label }}
-														</label>
-														{{ form.hora_valida }}
-													</div>
-
-													<div class="col-md-3">
-														<label class="form-label text-primary mb-0">
-															{{ form.solicitado.label }}
-														</label>
-														{{ form.solicitado }}
-													</div>
-													
-												</div>
-
-												<div class="row">
-													<div class="col-md-6">
-														<label class="form-label text-primary mb-0">
-															{{ form.comentario.label }}
-														</label>
-														{{ form.comentario }}
-													</div>
-
-													<div class="col-md-6">
-														<label class="form-label text-primary mb-0">
-															{{ form.id_cliente.label }}
-														</label>
-														{{ form.id_cliente }}
-													</div>
-												</div>
-
-												<div class="row">
-													<div class="col-md-2">
-														<label class="form-label text-primary mb-0">
-															{{ form.compro.label }}
-														</label>
-														{{ form.compro }}
-													</div>
-
-													<div class="col-md-2">
-														<label class="form-label text-primary mb-0">
-															{{ form.numero_comprobante.label }}
-														</label>
-														{{ form.numero_comprobante }}
-													</div>
-
-													<div class="col-md-2">
-														<label class="form-label text-primary mb-0">
-															{{ form.hs.label }}
-														</label>
-														{{ form.hs }}
+														{{ form.id_comercio }}
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									
+								
 								</div>
 								
 								<div class="container mt-3">
@@ -146,11 +95,12 @@
 		</div>
 	{% endblock principalcomponent %}
 {% endblock maincomponent %}
-
-<!-- Block Modals -------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------- -->
 {% block modals %}
-	{{ block.super }}
+	<!-- Modal para mostrar errores -->
+	{% include 'modal_errors.html' %}
 	
 	<!-- Modal para mostrar los requerimientos de los campos -->
 	{% include 'maestros/modal_fields_requirements.html' %}
 {% endblock modals %}
+<!-- -------------------------------------------------------------------- -->

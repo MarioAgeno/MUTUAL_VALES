@@ -242,5 +242,35 @@ estructura_campos = {
 			],
 		},
 	},
-	
+
+	'plan': {
+		'Información Planes': {
+			'fila_1': [
+				{'field_name': 'estatus_plan', 'columna': 2, 'design': None},
+				{'field_name': 'id_plan', 'columna': 2, 'design': None},
+				{'field_name': 'descripcion_plan', 'columna': 4, 'design': None},
+			],
+			'fila_2': [
+				{'field_name': 'cuota_plan', 'columna': 2, 'design': None},
+				{'field_name': 'interes_plan', 'columna': 2, 'design': None},
+				{'field_name': 'comision_plan', 'columna': 2, 'design': None},
+			],
+			'fila_3': [
+				{'field_name': 'vigente_desde', 'columna': 2, 'design': None},
+				{'field_name': 'vencimiento', 'columna': 2, 'design': None},
+			],
+		}
+	},
+
+	'plan_comercio': {
+		'Información Planes de Comercios': {
+			'fila_1': [
+				{'field_name': 'estatus_plan_comercio', 'columna': 2, 'design': None},
+			],
+			'fila_2': [
+				{'field_name': 'id_plan', 'columna': 4, 'design': None},
+				{'field_name': 'id_comercio', 'columna': 4, 'design': None},
+			],
+		}
+	},
 }

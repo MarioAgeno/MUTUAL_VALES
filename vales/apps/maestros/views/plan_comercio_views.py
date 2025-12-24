@@ -1,91 +1,88 @@
-# vales\apps\maestros\views\socio_views.py
+# vales\apps\maestros\views\plan_comercio_views.py
 from django.urls import reverse_lazy
 from .cruds_views_generics import *
-from ..models.socio_models import Socio
-from ..forms.socio_forms import SocioForm
-from django.utils import timezone
+from ..models.comercio_models import PlanComercio
+from ..forms.plan_comercio_forms import PlanComercioForm
 
 
 class ConfigViews():
-	#-- Modelo.
-	model = Socio
+	# Modelo
+	model = PlanComercio
 	
-	#-- Formulario asociado al modelo.
-	form_class = SocioForm
+	# Formulario asociado al modelo
+	form_class = PlanComercioForm
 	
-	#-- Aplicación asociada al modelo.
+	# Aplicación asociada al modelo
 	app_label = model._meta.app_label
 	
+	#-- Deshabilitado por redundancia:
+	# # Título del listado del modelo
+	# master_title = model._meta.verbose_name_plural
+	
 	#-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
-	model_string = model.__name__.lower()  #-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
+	# model_string = model.__name__.lower()  #-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
 	
 	#-- Usar esta forma cuando el modelo esté compuesto por más de una palabra: Ej. TipoCambio colocar "tipo_cambio".
-	#model_string = "tipo_cambio"
+	model_string = "plan_comercio" 
 	
-	#-- Permisos.
+	# Permisos
 	permission_add = f"{app_label}.add_{model.__name__.lower()}"
 	permission_change = f"{app_label}.change_{model.__name__.lower()}"
 	permission_delete = f"{app_label}.delete_{model.__name__.lower()}"
 	
-	#-- Vistas del CRUD del modelo.
+	# Vistas del CRUD del modelo
 	list_view_name = f"{model_string}_list"
 	create_view_name = f"{model_string}_create"
 	update_view_name = f"{model_string}_update"
 	delete_view_name = f"{model_string}_delete"
 	
-	#-- Plantilla para crear o actualizar el modelo.
+	# Plantilla para crear o actualizar el modelo
 	template_form = f"{app_label}/{model_string}_form.html"
 	
-	#-- Plantilla para confirmar eliminación de un registro.
+	# Plantilla para confirmar eliminación de un registro
 	template_delete = "base_confirm_delete.html"
 	
-	#-- Plantilla de la lista del CRUD.
+	# Plantilla de la lista del CRUD
 	template_list = f'{app_label}/maestro_list.html'
 	
-	#-- Contexto de los datos de la lista.
+	# Contexto de los datos de la lista
 	context_object_name	= 'objetos'
 	
-	#-- Vista del home del proyecto.
+	# Vista del home del proyecto
 	home_view_name = "home"
 	
-	#-- Nombre de la url.
+	# Nombre de la url 
 	success_url = reverse_lazy(list_view_name)
 
 
 class DataViewList():
-	search_fields = [
-		'id_socio',
-		'nombre_socio',
-		'cuit'
+	search_fields = ['id_plan_comercio',
+				  	 'id_plan__nombre_plan', 
+					 'id_comercio__nombre_comercio', 
 	]
 	
-	ordering = ['nombre_socio']
+	ordering = ['nombre_comercio']
 	
 	paginate_by = 8
-	  
+	
 	table_headers = {
-		'estatus_socio': (1, 'Estatus'),
-		'id_socio': (1, 'ID'),
-		'nombre_socio': (3, 'Nombre Socio'),
-		'telefono_socio': (1, 'Telefono'),
-		'cuit': (1, 'CUIT'),
-		'limite_credito': (2, 'Límite Crédito'),
-		'disponible_credito': (2, 'Crédito Disponible'),
-		'acciones': (1, 'Acciones'),
+		'estatus_plan_comercio': (1, 'Estatus'),
+		'id_plan_comercio': (1, 'ID'),
+		'nombre_comercio': (4, 'Nombre comercio'),
+		'nombre_plan': (4, 'Nombre plan'),
+		'acciones': (2, 'Acciones'),
 	}
 	
 	table_data = [
-		{'field_name': 'estatus_socio', 'date_format': None},
-		{'field_name': 'id_socio', 'date_format': None},
-		{'field_name': 'nombre_socio', 'date_format': None},
-		{'field_name': 'telefono_socio', 'date_format': None},
-		{'field_name': 'cuit', 'date_format': None},
-		{'field_name': 'limite_credito', 'date_format': 'currency'},
-		{'field_name': 'disponible_credito', 'date_format': 'currency'},
+		{'field_name': 'estatus_plan_comercio', 'date_format': None},
+		{'field_name': 'id_plan_comercio', 'date_format': None},
+		{'field_name': 'id_comercio', 'date_format': None},
+		{'field_name': 'id_plan', 'date_format': None},
 	]
 
 
-class SocioListView(MaestroListView):
+# PlanComercioListView - Inicio
+class PlanComercioListView(MaestroListView):
 	model = ConfigViews.model
 	template_name = ConfigViews.template_list
 	context_object_name = ConfigViews.context_object_name
@@ -105,7 +102,8 @@ class SocioListView(MaestroListView):
 	}
 
 
-class SocioCreateView(MaestroCreateView):
+# PlanComercioCreateView - Inicio
+class PlanComercioCreateView(MaestroCreateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -113,16 +111,17 @@ class SocioCreateView(MaestroCreateView):
 	success_url = ConfigViews.success_url
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
+	# (revisar de donde lo copiaste que tienes asignado permission_change en vez de permission_add)
 	permission_required = ConfigViews.permission_add
 	
-	def get_initial(self):
-		initial = super().get_initial()
-		#-- Asignar la sucursal del usuario autenticado como valor inicial.
-		initial['id_sucursal'] = self.request.user.id_sucursal
-		return initial
+	# extra_context = {
+	# 	"accion": f"Crear {ConfigViews.model._meta.verbose_name}",
+	# 	"list_view_name" : ConfigViews.list_view_name
+	# }
 
 
-class SocioUpdateView(MaestroUpdateView):
+# PlanComercioUpdateView
+class PlanComercioUpdateView(MaestroUpdateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -131,9 +130,15 @@ class SocioUpdateView(MaestroUpdateView):
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_change
+	
+	# extra_context = {
+	# 	"accion": f"Editar {ConfigViews.model._meta.verbose_name}",
+	# 	"list_view_name" : ConfigViews.list_view_name
+	# }
 
 
-class SocioDeleteView (MaestroDeleteView):
+# PlanComercioDeleteView
+class PlanComercioDeleteView (MaestroDeleteView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	template_name = ConfigViews.template_delete
@@ -141,3 +146,9 @@ class SocioDeleteView (MaestroDeleteView):
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_delete
+	
+	# extra_context = {
+	# 	"accion": f"Eliminar {ConfigViews.model._meta.verbose_name}",
+	# 	"list_view_name" : ConfigViews.list_view_name,
+	# 	"mensaje": "Estás seguro de eliminar el Registro"
+	# }

@@ -7,6 +7,7 @@ from .views.provincia_views import *
 from .views.localidad_views import *
 from .views.tipo_documento_identidad_views import *
 from .views.tipo_iva_views import *
+from .views.plan_views import *
 
 #-- Catálogos
 from .views.socio_views import *
@@ -14,7 +15,7 @@ from .views.comercio_views import *
 from .views.empresa_views import *
 from .views.sucursal_views import *
 from .views.parametro_views import *
-from .views.valida_views import *
+from .views.plan_comercio_views import *
 
 #-- Otras rutas.
 from .views.consulta_views_maestros import filtrar_localidad
@@ -53,6 +54,13 @@ urlpatterns = [
 	path('tipo_iva/<int:pk>/editar/', TipoIvaUpdateView.as_view(), name='tipo_iva_update'),
 	path('tipo_iva/<int:pk>/eliminar/', TipoIvaDeleteView.as_view(), name='tipo_iva_delete'),
 	
+	#-- Plan.
+	path('plan/', PlanListView.as_view(), name='plan_list'),
+	path('plan/nueva/', PlanCreateView.as_view(), name='plan_create'),
+	path('plan/<int:pk>/editar/', PlanUpdateView.as_view(), name='plan_update'),
+	path('plan/<int:pk>/eliminar/', PlanDeleteView.as_view(), name='plan_delete'),
+    
+	
 	#-- Catálogos:
 	#-- Socio.
 	path('socio/', SocioListView.as_view(), name='socio_list'),
@@ -65,7 +73,13 @@ urlpatterns = [
 	path('comercio/nueva/', ComercioCreateView.as_view(), name='comercio_create'),
 	path('comercio/<int:pk>/editar/', ComercioUpdateView.as_view(), name='comercio_update'),
 	path('comercio/<int:pk>/eliminar/', ComercioDeleteView.as_view(), name='comercio_delete'),
-		
+
+	#-- Plan Comercio.
+	path('plan_comercio/', PlanComercioListView.as_view(), name='plan_comercio_list'),
+	path('plan_comercio/nueva/', PlanComercioCreateView.as_view(), name='plan_comercio_create'),
+	path('plan_comercio/<int:pk>/editar/', PlanComercioUpdateView.as_view(), name='plan_comercio_update'),
+	path('plan_comercio/<int:pk>/eliminar/', PlanComercioDeleteView.as_view(), name='plan_comercio_delete'),
+
 	#-- Empresa.
 	path('empresa/', EmpresaListView.as_view(), name='empresa_list'),
 	path('empresa/nueva/', EmpresaCreateView.as_view(), name='empresa_create'),
@@ -83,12 +97,6 @@ urlpatterns = [
 	path('parametro/nueva/', ParametroCreateView.as_view(), name='parametro_create'),
 	path('parametro/<int:pk>/editar/', ParametroUpdateView.as_view(), name='parametro_update'),
 	path('parametro/<int:pk>/eliminar/', ParametroDeleteView.as_view(), name='parametro_delete'),
-	
-	#-- Valida.
-	path('valida/', ValidaListView.as_view(), name='valida_list'),
-	path('valida/nueva/', ValidaCreateView.as_view(), name='valida_create'),
-	path('valida/<int:pk>/editar/', ValidaUpdateView.as_view(), name='valida_update'),
-	path('valida/<int:pk>/eliminar/', ValidaDeleteView.as_view(), name='valida_delete'),
 	
 	#-- Otras rutas.
 	path('filtrar-localidad/', filtrar_localidad, name='filtrar_localidad'),

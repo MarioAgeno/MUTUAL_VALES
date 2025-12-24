@@ -5,7 +5,7 @@ import re
 
 from utils.validator.validaciones import validar_cuit
 from .base_gen_models import ModeloBaseGenerico
-from .base_models import Provincia, Localidad, TipoIva, Servicio
+from .base_models import Provincia, Localidad, TipoIva, Servicio, Plan
 from entorno.constantes_base import ESTATUS_GEN, PAGO_COMERCIO
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -83,3 +83,21 @@ class Comercio(ModeloBaseGenerico):
 	def cuit_formateado(self):
 		cuit = str(self.cuit)
 		return f"{cuit[:2]}-{cuit[2:-1]}-{cuit[-1:]}"
+
+
+class PlanComercio(ModeloBaseGenerico):
+	id_plan_comercio = models.AutoField(primary_key=True)
+	estatus_plan_comercio = models.BooleanField("Estatus*", default=True,
+										  choices=ESTATUS_GEN)
+	id_plan = models.ForeignKey(Plan, on_delete=models.PROTECT, 
+								  verbose_name="Plan*")
+	id_comercio = models.ForeignKey(Comercio, on_delete=models.PROTECT, 
+								  verbose_name="Comercio*")
+	class Meta:
+		db_table = 'plan_comercio'
+		verbose_name = ('Plan Comercio')
+		verbose_name_plural = ('Planes Comercios')
+		ordering = ['id_plan']
+	
+	def __str__(self):
+		return self.id_plan.descripcion_plan

@@ -50,6 +50,10 @@ class SocioForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'id_sucursal': 
 				forms.Select(attrs={**formclassselect}),
+			'limite_credito':
+				forms.TextInput(attrs={**formclasstext}),
+			'disponible_credito':
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 			'black_list': 
 				forms.Select(attrs={**formclassselect}),
 			'black_list_motivo': 

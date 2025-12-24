@@ -7,7 +7,6 @@ from diseno_base.diseno_bootstrap import (
 
 
 class ServicioForm(CrudGenericForm):
-	
 	class Meta:
 		model = Servicio
 		fields = '__all__'

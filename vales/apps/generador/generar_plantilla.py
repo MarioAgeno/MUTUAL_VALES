@@ -13,7 +13,7 @@ from estructuras_maestros import estructura_campos
 # Agregar la ruta del directorio principal del proyecto al sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..\\..')))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "neumatic.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "vales.settings")
 
 django.setup()
 

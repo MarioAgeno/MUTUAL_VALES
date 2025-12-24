@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from utils.validator.validaciones import validar_cuit
 import re
+from datetime import date
 
 from .base_gen_models import ModeloBaseGenerico
 from entorno.constantes_base import ESTATUS_GEN
@@ -156,15 +157,8 @@ class Empresa(ModeloBaseGenerico):
 	email_empresa = models.EmailField("Correo*", max_length=50)
 	web_empresa = models.CharField("Web", max_length=50, 
 								   null=True, blank=True)
-	
 	logo_empresa = models.BinaryField()  # Para el campo 'image'
-	
-	#-- Parámetros.
-	interes = models.DecimalField("Intereses(%)", max_digits=5,
-								decimal_places=2, default=0.00, blank=True)
-	fecha_vencimiento = models.DateField("Fecha Vencimiento", default=None,
-                               null=True, blank=True)
-	
+
 	class Meta:
 		db_table = 'empresa'
 		verbose_name = ('Empresa')
@@ -179,8 +173,6 @@ class Empresa(ModeloBaseGenerico):
 		
 		errors = {}
 		
-		interes_str = str(self.interes) if self.interes is not None else ""
-		
 		try:
 			validar_cuit(self.cuit)
 		except ValidationError as e:
@@ -191,9 +183,6 @@ class Empresa(ModeloBaseGenerico):
 		
 		if not re.match(r'^\+?\d[\d ]{0,19}$', str(self.telefono)):
 			errors.update({'telefono': 'Debe indicar sólo dígitos numéricos positivos, mínimo 1 y máximo 20, el signo + y espacios.'})
-		
-		if not re.match(r'^-?(0|[1-9]\d{0,1})(\.\d{1,2})?$', interes_str):
-			errors.update({'interes': 'El valor debe ser un número negativo o positivo, con hasta 2 dígitos enteros y hasta 2 decimales o cero.'})
 		
 		if errors:
 			raise ValidationError(errors)
@@ -234,3 +223,31 @@ class Parametro(ModeloBaseGenerico):
 		
 		if errors:
 			raise ValidationError(errors)
+
+
+class Plan(ModeloBaseGenerico):
+	id_plan = models.AutoField(primary_key=True)
+	estatus_plan = models.BooleanField("Estatus", default=True, choices=ESTATUS_GEN)
+	descripcion_plan = models.CharField("Descripción servicio", max_length=30)
+	cuota_plan = models.IntegerField("Cuotas", null=True, blank=True,
+							validators=[MinValueValidator(0), MaxValueValidator(99)])
+	interes_plan = models.DecimalField("Interes", max_digits=6, decimal_places=2,
+							default=0.00, null=True, blank=True,
+							validators=[MinValueValidator(0), MaxValueValidator(999.99)])
+	comision_plan = models.DecimalField("Comision", max_digits=6, decimal_places=2, 
+							default=0.00, null=True, blank=True,
+							validators=[MinValueValidator(0), MaxValueValidator(999.99)])
+	vigente_desde = models.DateField("Vigente Desde", default=date.today, null=True, blank=True)
+	vencimiento = models.DateField("Vencimiento", default=date.today, null=True, blank=True)
+
+	class Meta:
+		db_table = 'plan'
+		verbose_name = ('Plan')
+		verbose_name_plural = ('Planes')
+		ordering = ['descripcion_plan']
+
+	def __str__(self):
+		return self.descripcion_plan
+
+
+	
