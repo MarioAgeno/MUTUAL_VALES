@@ -57,19 +57,20 @@ class ConfigViews():
 
 class DataViewList():
 	search_fields = ['id_plan_comercio',
-				  	 'id_plan__nombre_plan', 
-					 'id_comercio__nombre_comercio', 
+		'id_comercio__nombre_comercio',
+		'id_plan__descripcion_plan',
 	]
-	
-	ordering = ['nombre_comercio']
-	
+
+	# Ordenar por el nombre del comercio y por la descripción del plan
+	ordering = ['id_comercio__nombre_comercio', 'id_plan__descripcion_plan']
+
 	paginate_by = 8
 	
 	table_headers = {
 		'estatus_plan_comercio': (1, 'Estatus'),
 		'id_plan_comercio': (1, 'ID'),
-		'nombre_comercio': (4, 'Nombre comercio'),
-		'nombre_plan': (4, 'Nombre plan'),
+		'id_comercio': (4, 'Nombre plan'),
+		'id_plan': (4, 'Nombre plan'),
 		'acciones': (2, 'Acciones'),
 	}
 	
