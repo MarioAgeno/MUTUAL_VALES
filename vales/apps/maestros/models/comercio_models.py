@@ -39,7 +39,7 @@ class Comercio(ModeloBaseGenerico):
 									null=True, blank=True,
 									verbose_name="Servicio*")
 	pago = models.IntegerField("Forma de Pago*", 
-										  default=True,
+										  default=1,
 										  choices=PAGO_COMERCIO)
 	bonificacion_comercio = models.DecimalField("Bonificación en %", max_digits=6, 
 							decimal_places=2, default=0.00,null=True, blank=True,

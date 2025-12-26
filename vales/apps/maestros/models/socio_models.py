@@ -9,13 +9,13 @@ from .base_gen_models import ModeloBaseGenerico
 from .base_models import (Localidad, Provincia, TipoIva, 
 						  TipoDocumentoIdentidad)
 from .sucursal_models import Sucursal
-from entorno.constantes_base import (
+from entorno.constantes_base import (SOLICITUD_SOCIO,
 	ESTATUS_GEN, SEXO, TIPO_PERSONA, SI_NO)
 
 
 class Socio(ModeloBaseGenerico):
 	id_socio = models.AutoField(primary_key=True)
-	estatus_socio = models.BooleanField("Estatus*", default=True, 
+	estatus_socio = models.BooleanField("Estatus*", default=False, 
 										  choices=ESTATUS_GEN)
 	codigo_socio = models.IntegerField("Código", null=True, blank=True)
 	nombre_socio = models.CharField("Nombre Socio*", max_length=50)
@@ -117,3 +117,21 @@ class Socio(ModeloBaseGenerico):
 	def nombre_tipo_documento_identidad(self):
 		return self.id_tipo_documento_identidad.nombre_documento_identidad
 	
+
+
+class SolicitudAdhesion(ModeloBaseGenerico):
+	id_socio_solicitud_adhesion = models.AutoField(primary_key=True)
+	estatus_socio_socio_solicitud_adhesion = models.BooleanField(
+							"Estatus*", default=True, 
+							choices=ESTATUS_GEN)
+	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
+								verbose_name="Socio*")
+	estado_solicitud_adhesion = models.IntegerField("Estado Solicitud Adhesión*", 
+											 default=1,
+											 choices=SOLICITUD_SOCIO)
+
+	class Meta:
+		db_table = 'solicitud_adhesion'
+		verbose_name = ('Solicitud de Adhesión')
+		verbose_name_plural = ('Solicitudes de Adhesión')
+		ordering = ['id_socio']

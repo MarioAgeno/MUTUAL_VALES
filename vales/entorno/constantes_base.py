@@ -40,3 +40,16 @@ MESES = [
 		('11', 'Noviembre'),
 		('12', 'Diciembre'),
 	]
+
+SOLICITUD_SOCIO = [
+	(1, 'Pendiente'),
+	(2, 'Aprobada'),
+	(3, 'Rechazada'),
+]
+
+SOLICITUD_VALE = [
+	(1, 'Pendiente'),
+	(2, 'Aprobado'),
+	(3, 'Rechazado'),
+    (4, 'Consumido'),
+]
