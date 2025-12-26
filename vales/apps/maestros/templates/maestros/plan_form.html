@@ -116,8 +116,64 @@
 									<a class="btn btn-secondary" href="{% url list_view_name %}">
 										Cancelar
 									</a>
+									{% if form.instance.pk %}
+										<button id="asignarBtn" class="btn btn-warning" type="button"
+											data-url="{% url 'plan_asignar_todos' form.instance.pk %}">
+											Asignar a comercios activos
+										</button>
+									{% endif %}
 								</div>
 							</form>
+
+							{% if form.instance.pk %}
+							<script>
+							// CSRF helper
+							function getCookie(name) {
+								let cookieValue = null;
+								if (document.cookie && document.cookie !== '') {
+									const cookies = document.cookie.split(';');
+									for (let i = 0; i < cookies.length; i++) {
+										const cookie = cookies[i].trim();
+										if (cookie.substring(0, name.length + 1) === (name + '=')) {
+											cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+											break;
+										}
+									}
+								}
+								return cookieValue;
+							}
+
+							document.getElementById('asignarBtn').addEventListener('click', function (e) {
+								e.preventDefault();
+								const btn = this;
+								const url = btn.getAttribute('data-url');
+								if (!confirm('Asignar este plan a todos los comercios activos? Se evitarán duplicados.')) return;
+								btn.disabled = true;
+								const csrftoken = getCookie('csrftoken');
+								fetch(url, {
+									method: 'POST',
+									headers: {
+										'X-CSRFToken': csrftoken,
+										'X-Requested-With': 'XMLHttpRequest',
+									},
+									body: null,
+								})
+								.then(response => response.json().then(data => ({status: response.status, body: data})))
+								.then(({status, body}) => {
+									if (status >= 200 && status < 300 && body.success) {
+										alert(body.message || 'Asignación completada.');
+									} else {
+										alert(body.message || 'Ocurrió un error en la asignación.');
+									}
+								})
+								.catch(err => {
+									console.error(err);
+									alert('Ocurrió un error de red al intentar asignar.');
+								})
+								.finally(() => btn.disabled = false);
+							});
+							</script>
+							{% endif %}
 						</div>
 					</div>
 				</div>

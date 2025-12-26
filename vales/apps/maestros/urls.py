@@ -58,6 +58,7 @@ urlpatterns = [
 	path('plan/', PlanListView.as_view(), name='plan_list'),
 	path('plan/nueva/', PlanCreateView.as_view(), name='plan_create'),
 	path('plan/<int:pk>/editar/', PlanUpdateView.as_view(), name='plan_update'),
+	path('plan/<int:pk>/asignar-todos/', PlanAsignarATodosView.as_view(), name='plan_asignar_todos'),
 	path('plan/<int:pk>/eliminar/', PlanDeleteView.as_view(), name='plan_delete'),
     
 	

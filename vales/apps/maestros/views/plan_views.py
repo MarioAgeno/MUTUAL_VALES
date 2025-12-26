@@ -1,7 +1,12 @@
 # vales\apps\maestros\views\plan_views.py
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from django.db import transaction
+from django.contrib import messages
 from .cruds_views_generics import *
 from ..models.base_models import Plan
+from ..models.comercio_models import PlanComercio, Comercio
 from ..forms.plan_forms_base import PlanForm
 
 
@@ -77,7 +82,6 @@ class DataViewList():
 		{'field_name': 'comision_plan', 'date_format': 'percentage'},
 	]
 
-
 class PlanListView(MaestroListView):
 	model = ConfigViews.model
 	template_name = ConfigViews.template_list
@@ -128,3 +132,46 @@ class PlanDeleteView (MaestroDeleteView):
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_delete
+
+
+
+class PlanAsignarATodosView(MaestroCustomView):
+	"""Asigna el plan a todos los comercios activos (sin duplicar)."""
+	permission_required = ConfigViews.permission_change
+	list_view_name = ConfigViews.list_view_name
+	
+	def post(self, request, pk, *args, **kwargs):
+		plan = get_object_or_404(Plan, pk=pk)
+		try:
+			with transaction.atomic():
+				comercios = Comercio.objects.filter(estatus_comercio=True)
+				created_count = 0
+				for c in comercios:
+					obj, created = PlanComercio.objects.get_or_create(
+						id_plan=plan,
+						id_comercio=c,
+						defaults={'estatus_plan_comercio': True}
+					)
+					if created:
+						created_count += 1
+				message = f"{created_count} planes asignados. {comercios.count()-created_count} ya existían."
+				# Si es AJAX, devolver JSON para que el cliente lo maneje
+				if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+					return JsonResponse({
+						'success': True,
+						'created': created_count,
+						'existing': comercios.count() - created_count,
+						'message': message,
+					})
+				else:
+					messages.success(request, message)
+		except Exception as e:
+			# Manejo de error para AJAX o petición normal
+			if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+				return JsonResponse({'success': False, 'message': f'Ocurrió un error al asignar: {e}'} , status=500)
+			else:
+				messages.error(request, f"Ocurrió un error al asignar: {e}")
+				return redirect('plan_update', pk=pk)
+
+		# Si no fue AJAX, redirigir al formulario de edición
+		return redirect('plan_update', pk=pk)
