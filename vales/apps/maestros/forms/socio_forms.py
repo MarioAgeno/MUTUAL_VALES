@@ -32,6 +32,8 @@ class SocioForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'id_tipo_documento_identidad': 
 				forms.Select(attrs={**formclassselect}),
+			'numero_documento': 
+				forms.TextInput(attrs={**formclasstext}),
 			'cuit': 
 				forms.TextInput(attrs={**formclasstext}),
 			'telefono_socio': 

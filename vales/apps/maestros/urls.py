@@ -16,6 +16,7 @@ from .views.empresa_views import *
 from .views.sucursal_views import *
 from .views.parametro_views import *
 from .views.plan_comercio_views import *
+from .views.solicitud_adhesion_views import *
 
 #-- Otras rutas.
 from .views.consulta_views_maestros import filtrar_localidad
@@ -80,6 +81,12 @@ urlpatterns = [
 	path('plan_comercio/nueva/', PlanComercioCreateView.as_view(), name='plan_comercio_create'),
 	path('plan_comercio/<int:pk>/editar/', PlanComercioUpdateView.as_view(), name='plan_comercio_update'),
 	path('plan_comercio/<int:pk>/eliminar/', PlanComercioDeleteView.as_view(), name='plan_comercio_delete'),
+
+	#-- Soclicitud Adhesion.
+	path('solicitud_adhesion/', SolicitudAdhesionListView.as_view(), name='solicitud_adhesion_list'),
+	path('solicitud_adhesion/nueva/', SolicitudAdhesionCreateView.as_view(), name='solicitud_adhesion_create'),
+	path('solicitud_adhesion/<int:pk>/editar/', SolicitudAdhesionUpdateView.as_view(), name='solicitud_adhesion_update'),
+	path('solicitud_adhesion/<int:pk>/eliminar/', SolicitudAdhesionDeleteView.as_view(), name='solicitud_adhesion_delete'),
 
 	#-- Empresa.
 	path('empresa/', EmpresaListView.as_view(), name='empresa_list'),

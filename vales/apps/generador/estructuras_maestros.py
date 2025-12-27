@@ -273,4 +273,21 @@ estructura_campos = {
 			],
 		}
 	},
+
+	'solicitud_adhesion': {
+		'Información Solicitud Adhesion Socios': {
+			'fila_1': [
+				{'field_name': 'estatus_solicitud_adhesion', 'columna': 2, 'design': None},
+				{'field_name': 'id_socio', 'columna': 4, 'design': None},
+			],
+			'fila_2': [
+				{'field_name': 'cuit_solicitud_adhesion', 'columna': 2, 'design': None},
+				{'field_name': 'movil_solicitud_adhesion', 'columna': 2, 'design': None},
+			],
+			'fila_3': [
+				{'field_name': 'email_solicitud_adhesion', 'columna': 4, 'design': None},
+				{'field_name': 'estado_solicitud_adhesion', 'columna': 2, 'design': None},
+			],
+		}
+	},
 }

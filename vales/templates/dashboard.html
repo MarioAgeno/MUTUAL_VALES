@@ -3,6 +3,24 @@
         <div class="container-fluid px-4">
             {% comment %} Accesos Directos Start {% endcomment %}
             <div class="row mt-1 mb-1">  <!-- Cambiado my-1 a mt-1 mb-0 -->
+                <!-- Solcitid de Adhesion -->
+                <div class="col-xl-1 col-md-3 text-center">
+                    <a href="{% url 'solicitud_adhesion_list' %}" class="text-decoration-none" title="Solicitud Adhesion">
+                        <div class="p-2 rounded-3 border border-primary hover-shadow" style="--bs-border-opacity: 0.5; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa fa-address-card fs-4 text-success"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Solcitid de Vales -->
+                <div class="col-xl-1 col-md-3 text-center">
+                    <a href="#" class="text-decoration-none" title="Solicitud Vales">
+                        <div class="p-2 rounded-3 border border-primary hover-shadow" style="--bs-border-opacity: 0.5; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-cart-plus fs-4 text-success"></i>
+                        </div>
+                    </a>
+                </div>
+                            
                 <!-- Comercios -->
                 <div class="col-xl-1 col-md-3 text-center">
                     <a href="{% url 'comercio_list' %}" class="text-decoration-none" title="Comercios">

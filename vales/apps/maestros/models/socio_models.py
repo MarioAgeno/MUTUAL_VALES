@@ -32,13 +32,15 @@ class Socio(ModeloBaseGenerico):
 									default="F", 
 									choices=TIPO_PERSONA)
 	id_tipo_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT,
-									verbose_name="Tipo de Iva*")
+									verbose_name="Tipo de IVA*")
 	id_tipo_documento_identidad = models.ForeignKey(TipoDocumentoIdentidad, 
 										on_delete=models.PROTECT, 
 										verbose_name="Tipo Doc. Identidad*")
-	cuit = models.IntegerField("Número doc.*", null=True, blank=True)
+	numero_documento = models.IntegerField("Número doc.*", null=True, blank=True)
+	cuit = models.IntegerField("CUIT/CUIL*", unique=True, null=True, blank=True)
 	telefono_socio = models.CharField("Teléfono*", max_length=15)
-	telefono2_socio = models.CharField("Teléfono Alternativo", max_length=15, null=True, blank=True)
+	telefono2_socio = models.CharField("Teléfono Alternativo", max_length=15,
+									 null=True, blank=True)
 	movil_socio = models.CharField("Móvil", max_length=15, null=True, blank=True)
 	email_socio = models.EmailField("Email*", max_length=50)
 	fecha_nacimiento = models.DateField("Fecha Nacimiento", 
@@ -83,18 +85,17 @@ class Socio(ModeloBaseGenerico):
 		telefono_str = str(self.telefono_socio) if self.telefono_socio else ''
 		movil_socio_str = str(self.movil_socio) if self.movil_socio else ''
 
-		if getattr(self, 'id_tipo_documento_identidad', None) is not None:
-			nombre_doc = self.id_tipo_documento_identidad.nombre_documento_identidad.lower()
-			if nombre_doc in ('cuit', 'cuil'):
-				try:
-					validar_cuit(self.cuit)
-				except ValidationError as e:
-					#-- Agrego el error al dicciobario errors.
-					errors['cuit'] = e.messages
+		try:
+			validar_cuit(self.cuit)
+		except ValidationError as e:
+			errors['cuit'] = e.messages
 	
 		if not self.cuit:
-			errors.update({'cuit': 'Debe indicar un Número de Documento de Identidad.'})
+			errors.update({'cuit': 'Debe indicar un Número de CUIT / CUIL'})
 		
+		if not self.numero_documento:
+			errors.update({'numero_documento': 'Debe indicar un Número de Documento de Identidad.'})
+
 		if not re.match(r'^\+?\d[\d ]{0,14}$', telefono_str):
 			errors.update({'telefono_socio': 'Debe indicar sólo dígitos numéricos positivos, \
        			mínimo 1 y máximo 15, el signo + y espacios.'})
@@ -118,17 +119,22 @@ class Socio(ModeloBaseGenerico):
 		return self.id_tipo_documento_identidad.nombre_documento_identidad
 	
 
-
 class SolicitudAdhesion(ModeloBaseGenerico):
-	id_socio_solicitud_adhesion = models.AutoField(primary_key=True)
-	estatus_socio_socio_solicitud_adhesion = models.BooleanField(
-							"Estatus*", default=True, 
-							choices=ESTATUS_GEN)
+	id_solicitud_adhesion = models.AutoField(primary_key=True)
+	estatus_solicitud_adhesion = models.BooleanField(
+									"Estatus*", default=True, 
+									choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
-								verbose_name="Socio*")
+									verbose_name="Socio*")
+	cuit_solicitud_adhesion = models.IntegerField("CUIT/CUIL*", 
+									null=True, blank=True)
+	movil_solicitud_adhesion = models.CharField("Móvil*", max_length=15, 
+									null=True, blank=True)
+	email_solicitud_adhesion = models.EmailField("Email*", max_length=50,
+									null=True, blank=True)
 	estado_solicitud_adhesion = models.IntegerField("Estado Solicitud Adhesión*", 
-											 default=1,
-											 choices=SOLICITUD_SOCIO)
+									default=1,
+									choices=SOLICITUD_SOCIO)
 
 	class Meta:
 		db_table = 'solicitud_adhesion'

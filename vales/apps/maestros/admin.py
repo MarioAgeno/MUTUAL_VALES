@@ -1,7 +1,7 @@
 # vales\apps\maestros\admin.py
 from django.contrib import admin
 
-from .models.socio_models import Socio
+from .models.socio_models import Socio, SolicitudAdhesion
 from .models.comercio_models import Comercio, PlanComercio
 from .models.sucursal_models import Sucursal
 from .models.base_models import *
@@ -11,6 +11,7 @@ admin.site.register(Socio)
 admin.site.register(Comercio)
 admin.site.register(Sucursal)
 admin.site.register(PlanComercio)
+admin.site.register(SolicitudAdhesion)
 
 # Registramos los modelos base
 admin.site.register(Servicio)
