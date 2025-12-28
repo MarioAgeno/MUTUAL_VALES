@@ -125,3 +125,19 @@ def get_estatus(estatus):
 @register.filter
 def get_si_no(estatus):
 	return "Si" if estatus else "No"
+
+
+@register.filter
+def get_display_value(obj, field_name):
+	"""
+	Obtiene el valor de display para un campo con choices, si existe.
+	Si no, devuelve el valor original.
+	"""
+	try:
+		display_method = f'get_{field_name}_display'
+		if hasattr(obj, display_method):
+			return getattr(obj, display_method)()
+		else:
+			return getattr(obj, field_name)
+	except AttributeError:
+		return getattr(obj, field_name, None)

@@ -117,7 +117,7 @@
 														{% elif field_value|get_type == 'float' or field_value|get_type == 'Decimal' %}
 															<td class="decimal">{{ objeto|get_attribute:data_info.field_name|formato_es_ar }}</td>
 														{% elif field_value|get_type == 'int' %}
-															<td>{{ objeto|get_attribute:data_info.field_name }}</td>
+															<td>{{ objeto|get_display_value:data_info.field_name }}</td>
 														{% else %}
 															{% if data_info.date_format %}
 																<td>{{ objeto|get_attribute:data_info.field_name|default:"" |date:data_info.date_format }}</td>

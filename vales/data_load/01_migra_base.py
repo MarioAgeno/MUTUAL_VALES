@@ -16,6 +16,7 @@ SCRIPTS = [
     'tipo_iva_migra.py',
     'servicio_migra.py',
     'comercio_migra.py',
+    'socio_migra.py',
 ]
 
 def configurar_entorno():

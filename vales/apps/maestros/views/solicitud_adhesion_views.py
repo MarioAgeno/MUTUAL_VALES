@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from .cruds_views_generics import *
 from ..models.socio_models import SolicitudAdhesion
 from ..forms.solicitud_adhesion_forms import SolicitudAdhesionForm
+from entorno.constantes_base import SOLICITUD_SOCIO
 
 
 class ConfigViews():
@@ -56,10 +57,7 @@ class ConfigViews():
 
 
 class DataViewList():
-	search_fields = ['id_solicitud_adhesion',
-		'id_socio__nombre_socio',
-		'cuit_solicitud_adhesion',
-	]
+	search_fields = ['id_socio__nombre_socio', 'cuit_solicitud_adhesion']
 
 	# Ordenar por el nombre del comercio y por la descripción del plan
 	ordering = ['id_socio__nombre_socio', 'cuit_solicitud_adhesion']
@@ -94,6 +92,48 @@ class SolicitudAdhesionListView(MaestroListView):
 	
 	search_fields = DataViewList.search_fields
 	ordering = DataViewList.ordering
+	
+	def get_queryset(self):
+		queryset = self.model.objects.all()
+		
+		# Obtener el valor de búsqueda
+		query = self.request.GET.get('busqueda', None)
+		
+		if query:
+			# Crear diccionario inverso para mapear texto a valor
+			estado_dict = {display.lower(): value for value, display in SOLICITUD_SOCIO}
+			
+			# Dividir la query en palabras
+			palabras = query.lower().split()
+			
+			# Buscar si alguna palabra coincide parcialmente con un estado
+			estado_filtrar = None
+			palabras_busqueda = []
+			for palabra in palabras:
+				estado_encontrado = None
+				for value, display in SOLICITUD_SOCIO:
+					if len(palabra) >= 3 and display.lower().startswith(palabra):
+						estado_encontrado = value
+						break
+				if estado_encontrado is not None:
+					estado_filtrar = estado_encontrado
+				else:
+					palabras_busqueda.append(palabra)
+			
+			# Aplicar filtro de estado si se encontró
+			if estado_filtrar is not None:
+				queryset = queryset.filter(estado_solicitud_adhesion=estado_filtrar)
+			
+			# Aplicar búsqueda en otros campos con las palabras restantes
+			if palabras_busqueda:
+				from django.db.models import Q
+				busqueda_texto = ' '.join(palabras_busqueda)
+				search_conditions = Q()
+				for field in self.search_fields:
+					search_conditions |= Q(**{f"{field}__icontains": busqueda_texto})
+				queryset = queryset.filter(search_conditions)
+		
+		return queryset.order_by(*self.ordering)
 	
 	extra_context = {
 		"master_title": ConfigViews.model._meta.verbose_name_plural,

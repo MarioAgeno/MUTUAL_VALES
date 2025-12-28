@@ -12,7 +12,6 @@ from .sucursal_models import Sucursal
 from entorno.constantes_base import (SOLICITUD_SOCIO,
 	ESTATUS_GEN, SEXO, TIPO_PERSONA, SI_NO)
 
-
 class Socio(ModeloBaseGenerico):
 	id_socio = models.AutoField(primary_key=True)
 	estatus_socio = models.BooleanField("Estatus*", default=False, 
