@@ -73,7 +73,7 @@ class DataViewList():
 		'estado_solicitud_adhesion': (2, 'Estado Solicitud'),
 		'acciones': (1, 'Acciones'),
 	}
-	
+
 	table_data = [
 		{'field_name': 'estatus_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'id_solicitud_adhesion', 'date_format': None},

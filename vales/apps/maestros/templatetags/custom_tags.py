@@ -1,7 +1,8 @@
-# neumatic\apps\maestros\templatetags\custom_tags.py
+# vales\apps\maestros\templatetags\custom_tags.py
 from django import template
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import locale
+from babel.numbers import format_decimal
 
 register = template.Library()
 
@@ -59,25 +60,16 @@ def get_type(value):
 
 @register.filter
 def formato_es_ar(value):
-	"""
-	Formatea un número con el formato de Argentina:
-	Separador de miles: punto (.)
-	Separador decimal: coma (,)
-	Compatible con float y Decimal.
-	"""
-	try:
-		#-- Configura el locale para números en es_AR.
-		locale.setlocale(locale.LC_NUMERIC, 'es_AR.UTF-8')
-		
-		#-- Convierte a float si el valor es Decimal.
-		if isinstance(value, Decimal):
-			value = float(value)
-		
-		#-- Formatea con separadores de miles y 2 decimales.
-		return locale.format_string('%.2f', value, grouping=True)
-	except (ValueError, TypeError):
-		#-- Devuelve el valor sin formatear si no es un número válido.
-		return value
+    if value is None or value == "":
+        return ""
+    try:
+        # Asegura Decimal para evitar floats raros
+        value = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return value
+
+    # es_AR: miles con punto, decimales con coma
+    return format_decimal(value, locale="es_AR")
 
 
 @register.filter
@@ -103,18 +95,6 @@ def formato_es_ar_entero(value):
     except (ValueError, TypeError):
         # Devuelve el valor sin formatear si no es un número válido
         return value
-
-
-@register.simple_tag
-def get_color_estado(nombre_estado):
-	"""
-	Devuelve el color del Estado de Producto según el nombre del Estado si lo consigue,
-	de lo contrario devuelve color blanco.
-	"""
-	try:
-		return ProductoEstado.objects.get(nombre_producto_estado=nombre_estado).color
-	except ProductoEstado.DoesNotExist:
-		return '#FFFFFF'  # Color por defecto si no existe
 
 
 @register.filter
