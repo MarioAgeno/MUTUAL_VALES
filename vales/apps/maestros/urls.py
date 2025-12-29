@@ -17,6 +17,7 @@ from .views.sucursal_views import *
 from .views.parametro_views import *
 from .views.plan_comercio_views import *
 from .views.solicitud_adhesion_views import *
+from .views.solicitud_vale_views import *
 
 #-- Otras rutas.
 from .views.consulta_views_maestros import filtrar_localidad
@@ -105,7 +106,13 @@ urlpatterns = [
 	path('parametro/nueva/', ParametroCreateView.as_view(), name='parametro_create'),
 	path('parametro/<int:pk>/editar/', ParametroUpdateView.as_view(), name='parametro_update'),
 	path('parametro/<int:pk>/eliminar/', ParametroDeleteView.as_view(), name='parametro_delete'),
-	
+
+	#-- Soclicitud Vales.
+	path('solicitud_vale/', SolicitudValeListView.as_view(), name='solicitud_vale_list'),
+	path('solicitud_vale/nueva/', SolicitudValeCreateView.as_view(), name='solicitud_vale_create'),
+	path('solicitud_vale/<int:pk>/editar/', SolicitudValeUpdateView.as_view(), name='solicitud_vale_update'),
+	path('solicitud_vale/<int:pk>/eliminar/', SolicitudValeDeleteView.as_view(), name='solicitud_vale_delete'),
+
 	#-- Otras rutas.
 	path('filtrar-localidad/', filtrar_localidad, name='filtrar_localidad'),
 	path('verificar-codigo-postal/', verificar_codigo_postal, name='verificar_codigo_postal'),

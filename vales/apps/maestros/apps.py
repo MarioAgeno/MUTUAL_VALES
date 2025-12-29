@@ -12,3 +12,4 @@ class MaestrosConfig(AppConfig):
 		import apps.maestros.models.socio_models
 		import apps.maestros.models.comercio_models
 		import apps.maestros.models.sucursal_models
+		import apps.maestros.models.vale_models
