@@ -57,3 +57,17 @@ class SolicitudAdhesionForm(CrudGenericForm):
             self.fields['movil_socio'].initial = socio.movil_socio
             self.fields['email_socio'].initial = socio.email_socio
 
+            self.fields['id_socio'].initial = self.initial.get('id_socio')
+			#-- Deshabilita el campo.
+            self.fields['id_socio'].widget.attrs['disabled'] = True
+            self.fields['id_socio'].required = False
+            self.initial['id_socio'] = self.instance.id_socio
+
+    def clean(self):
+        cleaned_data = super().clean()
+        #-- Asignar automáticamente id_socio si el formulario está en modo edición.
+        if self.instance.pk:
+            cleaned_data['id_socio'] = self.instance.id_socio
+			#-- Remover id_socio de la validación en modo edición.
+            self._errors.pop('id_socio', None)
+        return cleaned_data
