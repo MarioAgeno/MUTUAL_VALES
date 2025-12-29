@@ -37,10 +37,12 @@ class SolicitudAdhesionForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'cuit_solicitud_adhesion': 
 				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+			'limite_credito_solicitud_adhesion': 
+				forms.NumberInput(attrs={**formclasstext}),
 			'movil_solicitud_adhesion': 
-				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+				forms.TextInput(attrs={**formclasstext}),
 			'email_solicitud_adhesion': 
-				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+				forms.EmailInput(attrs={**formclasstext}),
 			'estado_solicitud_adhesion': 
 				forms.Select(attrs={**formclassselect}),
 		}
@@ -54,3 +56,4 @@ class SolicitudAdhesionForm(CrudGenericForm):
             self.fields['cuit'].initial = socio.cuit
             self.fields['movil_socio'].initial = socio.movil_socio
             self.fields['email_socio'].initial = socio.email_socio
+

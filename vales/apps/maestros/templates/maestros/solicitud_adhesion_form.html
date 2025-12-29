@@ -1,6 +1,6 @@
 {% extends 'maestro_form.html' %}
 {% load static %}
-<!-- -------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------- -->
 {% block maincomponent %}
 	{% block principalcomponent %}
 		<div id="layoutSidenav_content">
@@ -92,6 +92,12 @@
 															{{ form.estado_solicitud_adhesion.label }}
 														</label>
 														{{ form.estado_solicitud_adhesion }}
+													</div>
+													<div class="col-md-2">
+														<label class="form-label text-primary mb-0">
+															{{ form.limite_credito_solicitud_adhesion.label }}
+														</label>
+														{{ form.limite_credito_solicitud_adhesion }}
 													</div>
 												</div>
 											</div>

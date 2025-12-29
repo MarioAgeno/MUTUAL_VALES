@@ -9,7 +9,7 @@ from entorno.constantes_base import SOLICITUD_SOCIO
 class ConfigViews():
 	# Modelo
 	model = SolicitudAdhesion
-	
+
 	# Formulario asociado al modelo
 	form_class = SolicitudAdhesionForm
 	

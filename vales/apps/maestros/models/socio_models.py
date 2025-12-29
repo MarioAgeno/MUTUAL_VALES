@@ -127,6 +127,9 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 									verbose_name="Socio*")
 	cuit_solicitud_adhesion = models.IntegerField("CUIT/CUIL*", 
 									null=True, blank=True)
+	limite_credito_solicitud_adhesion = models.DecimalField("Límite de Crédito Solicitado", 
+										 max_digits=15, decimal_places=2,
+										 default=0.00, null=True, blank=True)
 	movil_solicitud_adhesion = models.CharField("Móvil*", max_length=15, 
 									null=True, blank=True)
 	email_solicitud_adhesion = models.EmailField("Email*", max_length=50,
@@ -140,3 +143,18 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 		verbose_name = ('Solicitud de Adhesión')
 		verbose_name_plural = ('Solicitudes de Adhesión')
 		ordering = ['id_socio']
+
+	def save(self, *args, **kwargs):
+		# Verificar si el estado cambió a Aprobada (2)
+		if self.estado_solicitud_adhesion == 2:
+			self.estatus_solicitud_adhesion = True
+			socio = self.id_socio
+			socio.estatus_socio = True
+			socio.limite_credito = self.limite_credito_solicitud_adhesion or 0.00
+			socio.disponible_credito = socio.limite_credito
+			if self.movil_solicitud_adhesion:
+				socio.movil_socio = self.movil_solicitud_adhesion
+			if self.email_solicitud_adhesion:
+				socio.email_socio = self.email_solicitud_adhesion
+			socio.save()
+		super().save(*args, **kwargs)
