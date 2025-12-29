@@ -1,4 +1,4 @@
-# neumatic\apps\maestros\views\cruds_views_generics.py
+# vales\apps\maestros\views\cruds_views_generics.py
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, View
 from django.db.models import Q
 from django.http import JsonResponse
@@ -14,6 +14,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 # -- Vistas Genéricas Basada en Clases -----------------------------------------------
@@ -174,7 +175,22 @@ class MaestroUpdateView(PermissionRequiredMixin, UpdateView):
 		form.instance.id_user = user
 		form.instance.usuario = user.username
 		
-		return super().form_valid(form)
+		try:
+			with transaction.atomic():
+				return super().form_valid(form)
+		except ValidationError as e:
+			context = self.get_context_data(form=form)
+			# Mostrar los errores de validación en el formulario
+			msg = e.message_dict if hasattr(e, 'message_dict') else str(e)
+			context['transaction_error'] = msg
+			# También mostrar mensaje persistente en la UI
+			messages.error(self.request, msg if isinstance(msg, str) else '; '.join([str(v) for v in msg.values()]))
+			return self.render_to_response(context)
+		except Exception as e:
+			context = self.get_context_data(form=form)
+			context['transaction_error'] = str(e)
+			messages.error(self.request, str(e))
+			return self.render_to_response(context)
 	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
