@@ -5,6 +5,7 @@ import re
 from datetime import date
 
 from .base_gen_models import ModeloBaseGenerico
+from .base_models import Plan
 from .socio_models import Socio
 from .comercio_models import Comercio
 from entorno.constantes_base import (SOLICITUD_VALE, ESTATUS_GEN)
@@ -12,7 +13,7 @@ from entorno.constantes_base import (SOLICITUD_VALE, ESTATUS_GEN)
 class SolcitudVale(ModeloBaseGenerico):
 	id_solicitud_vale = models.AutoField(primary_key=True)
 	estatus_solicitud_vale = models.BooleanField("Estatus*", default=False, 
-										  choices=ESTATUS_GEN)
+									choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
 									null=True, blank=True,
 									verbose_name="Socio*")
@@ -20,19 +21,19 @@ class SolcitudVale(ModeloBaseGenerico):
 									null=True, blank=True,
 									verbose_name="Comercio*")
 	monto_solicitud_vale = models.DecimalField("Monto Solicitud Vale", 
-										 max_digits=15, decimal_places=2,
-										 default=0.00)
+									max_digits=15, decimal_places=2,
+									default=0.00)
 	estado_solicitud_vale = models.IntegerField("Estado Solicitud Vale*", 
-										 default=1, choices=SOLICITUD_VALE)
+									default=1, choices=SOLICITUD_VALE)
 	limite_aprobado = models.DecimalField("Límite Aprobado", max_digits=15, 
-									     decimal_places=2, default=0.00)
+									decimal_places=2, default=0.00)
 	fecha_aprobacion = models.DateField("Fecha Aprobación", 
-									 null=True, blank=True)
+									null=True, blank=True)
 	observaciones = models.CharField("Observaciones", max_length=200, 
 									 null=True, blank=True)
 	
 	class Meta:
-		db_table = 'vale'
+		db_table = 'solicitud_vale'
 		verbose_name = ('Solicitud Vale')
 		verbose_name_plural = ('Solicitudes de Vales')
 		ordering = ['id_solicitud_vale']
@@ -59,7 +60,7 @@ class SolcitudVale(ModeloBaseGenerico):
 				orig = None
 			if orig and orig.estado_solicitud_vale != 1:
 				# No permitir modificaciones cuando el estado no es Pendiente
-				raise ValidationError('No se puede modificar este registro porque su estado no es Pendiente.')
+				raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
 
 		# Lógica al cambiar estado
 		# 2 -> Aprobado: guardar fecha y activar estatus
@@ -76,3 +77,33 @@ class SolcitudVale(ModeloBaseGenerico):
 	def __str__(self):
 		return f"{self.id_socio.nombre_socio} - {self.monto_solicitud_vale}"
 	
+
+class Vale(ModeloBaseGenerico):
+	id_vale = models.AutoField(primary_key=True)
+	estatus_vale = models.BooleanField("Estatus*", default=False, 
+									choices=ESTATUS_GEN)
+	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
+									null=True, blank=True,
+									verbose_name="Socio*")
+	id_comercio = models.ForeignKey(Comercio, on_delete=models.CASCADE,
+									null=True, blank=True,
+									verbose_name="Comercio*")
+	id_plan = models.ForeignKey(Plan, on_delete=models.CASCADE,
+									null=True, blank=True,
+									verbose_name="Plan*")
+	monto_vale = models.DecimalField("Monto Vale*", 
+									max_digits=15, decimal_places=2,
+									default=0.00)
+	estado_vale = models.IntegerField("Estado Vale*", 
+									default=1, choices=SOLICITUD_VALE)
+	fecha_vale = models.DateField("Fecha Compra*", 
+									null=True, blank=True)
+	
+	class Meta:
+		db_table = 'vale'
+		verbose_name = ('Vale')
+		verbose_name_plural = ('Vales')
+		ordering = ['id_vale']
+												
+	def __str__(self):
+		return f"{self.id_socio.nombre_socio} - {self.monto_vale}"

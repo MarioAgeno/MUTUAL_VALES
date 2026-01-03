@@ -312,4 +312,23 @@ estructura_campos = {
 		}
 	},
 
+	'vale': {
+		'Vales Socios': {
+			'fila_1': [
+				{'field_name': 'estatus_vale', 'columna': 2, 'design': None},
+			],
+			'fila_2': [
+				{'field_name': 'id_socio', 'columna': 3, 'design': None},
+				{'field_name': 'id_comercio', 'columna': 3, 'design': None},
+			],
+			'fila_3': [
+				{'field_name': 'id_plan', 'columna': 3, 'design': None},
+				{'field_name': 'monto_vale', 'columna': 2, 'design': None},
+			],
+			'fila_4': [
+				{'field_name': 'estado_vale', 'columna': 2, 'design': None},
+				{'field_name': 'fecha_vale', 'columna': 2, 'design': None},
+			],
+		}
+	},
 }

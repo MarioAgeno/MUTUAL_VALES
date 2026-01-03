@@ -18,6 +18,7 @@ from .views.parametro_views import *
 from .views.plan_comercio_views import *
 from .views.solicitud_adhesion_views import *
 from .views.solicitud_vale_views import *
+from .views.vale_views import *
 
 #-- Otras rutas.
 from .views.consulta_views_maestros import filtrar_localidad
@@ -112,6 +113,12 @@ urlpatterns = [
 	path('solicitud_vale/nueva/', SolicitudValeCreateView.as_view(), name='solicitud_vale_create'),
 	path('solicitud_vale/<int:pk>/editar/', SolicitudValeUpdateView.as_view(), name='solicitud_vale_update'),
 	path('solicitud_vale/<int:pk>/eliminar/', SolicitudValeDeleteView.as_view(), name='solicitud_vale_delete'),
+
+	#-- Vales.
+	path('vale/', ValeListView.as_view(), name='vale_list'),
+	path('vale/nueva/', ValeCreateView.as_view(), name='vale_create'),
+	path('vale/<int:pk>/editar/', ValeUpdateView.as_view(), name='vale_update'),
+	path('vale/<int:pk>/eliminar/', ValeDeleteView.as_view(), name='vale_delete'),
 
 	#-- Otras rutas.
 	path('filtrar-localidad/', filtrar_localidad, name='filtrar_localidad'),

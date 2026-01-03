@@ -1,17 +1,17 @@
-# vales\apps\maestros\views\solicitud_vale_views.py
+# vales\apps\maestros\views\vale_views.py
 from django.urls import reverse_lazy
 from .cruds_views_generics import *
-from ..models.vale_models import SolcitudVale
-from ..forms.solicitud_vale_forms import SolcitudValeForm
-from entorno.constantes_base import SOLICITUD_SOCIO
+from ..models.vale_models import Vale
+from ..forms.vale_forms import ValeForm
+from entorno.constantes_base import SOLICITUD_VALE
 
 
 class ConfigViews():
 	# Modelo
-	model = SolcitudVale
+	model = Vale
 
 	# Formulario asociado al modelo
-	form_class = SolcitudValeForm
+	form_class = ValeForm
 	
 	# Aplicación asociada al modelo
 	app_label = model._meta.app_label
@@ -21,10 +21,10 @@ class ConfigViews():
 	# master_title = model._meta.verbose_name_plural
 	
 	#-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
-	# model_string = model.__name__.lower()  #-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
+	model_string = model.__name__.lower()  #-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
 	
 	#-- Usar esta forma cuando el modelo esté compuesto por más de una palabra: Ej. TipoCambio colocar "tipo_cambio".
-	model_string = "solicitud_vale" 
+	#model_string = "solcitud_vale" 
 	
 	# Permisos
 	permission_add = f"{app_label}.add_{model.__name__.lower()}"
@@ -57,7 +57,7 @@ class ConfigViews():
 
 
 class DataViewList():
-	search_fields = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio', 'estado_solicitud_vale']
+	search_fields = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio', 'estado_vale']
 
 	# Ordenar por el nombre del comercio y por la descripción del plan
 	ordering = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio']
@@ -65,27 +65,27 @@ class DataViewList():
 	paginate_by = 8
 	
 	table_headers = {
-		'estatus_solicitud_vale': (1, 'Estatus'),
-		'id_solicitud_vale': (1, 'ID Solicitud'),
+		'estatus_vale': (1, 'Estatus'),
+		'id_vale': (1, 'ID Vale'),
 		'id_socio': (2, 'Nombre Socio'),
 		'id_comercio': (2, 'Comercio'),
-		'monto_solicitud_vale': (2, 'Monto Solicitud'),
-		'estado_solicitud_vale': (2, 'Estado Solicitud'),
+		'monto_vale': (2, 'Monto Vale'),
+		'estado_vale': (2, 'Estado Vale'),
 		'acciones': (1, 'Acciones'),
 	}
 
 	table_data = [
-		{'field_name': 'estatus_solicitud_vale', 'date_format': None},
-		{'field_name': 'id_solicitud_vale', 'date_format': None},
+		{'field_name': 'estatus_vale', 'date_format': None},
+		{'field_name': 'id_vale', 'date_format': None},
 		{'field_name': 'id_socio', 'date_format': None},
 		{'field_name': 'id_comercio', 'date_format': None},
-		{'field_name': 'monto_solicitud_vale', 'date_format': None},
-		{'field_name': 'estado_solicitud_vale', 'date_format': None},
+		{'field_name': 'monto_vale', 'date_format': None},
+		{'field_name': 'estado_vale', 'date_format': None},
 	]
 
 
-# Solicitud Vale - Inicio
-class SolicitudValeListView(MaestroListView):
+# Vale List - Inicio
+class ValeListView(MaestroListView):
 	model = ConfigViews.model
 	template_name = ConfigViews.template_list
 	context_object_name = ConfigViews.context_object_name
@@ -101,7 +101,7 @@ class SolicitudValeListView(MaestroListView):
 		
 		if query:
 			# Crear diccionario inverso para mapear texto a valor
-			estado_dict = {display.lower(): value for value, display in SOLICITUD_SOCIO}
+			estado_dict = {display.lower(): value for value, display in SOLICITUD_VALE}
 			
 			# Dividir la query en palabras
 			palabras = query.lower().split()
@@ -111,7 +111,7 @@ class SolicitudValeListView(MaestroListView):
 			palabras_busqueda = []
 			for palabra in palabras:
 				estado_encontrado = None
-				for value, display in SOLICITUD_SOCIO:
+				for value, display in SOLICITUD_VALE:
 					if len(palabra) >= 3 and display.lower().startswith(palabra):
 						estado_encontrado = value
 						break
@@ -122,7 +122,7 @@ class SolicitudValeListView(MaestroListView):
 			
 			# Aplicar filtro de estado si se encontró
 			if estado_filtrar is not None:
-				queryset = queryset.filter(estado_solicitud_vale=estado_filtrar)
+				queryset = queryset.filter(estado_vale=estado_filtrar)
 			
 			# Aplicar búsqueda en otros campos con las palabras restantes
 			if palabras_busqueda:
@@ -147,8 +147,8 @@ class SolicitudValeListView(MaestroListView):
 	}
 
 
-# Solicitud Vale Creacion - Inicio
-class SolicitudValeCreateView(MaestroCreateView):
+# Vale Nuevo - Inicio
+class ValeCreateView(MaestroCreateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -165,8 +165,8 @@ class SolicitudValeCreateView(MaestroCreateView):
 	# }
 
 
-# Solicitud Vale Update
-class SolicitudValeUpdateView(MaestroUpdateView):
+# Vale Update
+class ValeUpdateView(MaestroUpdateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -182,8 +182,8 @@ class SolicitudValeUpdateView(MaestroUpdateView):
 	# }
 
 
-# Solicitud Vale Delete
-class SolicitudValeDeleteView (MaestroDeleteView):
+# Vale Delete
+class ValeDeleteView (MaestroDeleteView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	template_name = ConfigViews.template_delete
