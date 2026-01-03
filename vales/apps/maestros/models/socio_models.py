@@ -128,8 +128,8 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 	cuit_solicitud_adhesion = models.IntegerField("CUIT/CUIL*", 
 									null=True, blank=True)
 	limite_credito_solicitud_adhesion = models.DecimalField("Límite de Crédito Solicitado", 
-										 max_digits=15, decimal_places=2,
-										 default=0.00, null=True, blank=True)
+									max_digits=15, decimal_places=2,
+									default=0.00, null=True, blank=True)
 	movil_solicitud_adhesion = models.CharField("Móvil*", max_length=15, 
 									null=True, blank=True)
 	email_solicitud_adhesion = models.EmailField("Email*", max_length=50,

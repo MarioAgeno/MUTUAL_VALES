@@ -13,43 +13,47 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Comercio(ModeloBaseGenerico):
 	id_comercio = models.AutoField(primary_key=True)
 	estatus_comercio = models.BooleanField("Estatus", default=True, 
-										 choices=ESTATUS_GEN)
+									choices=ESTATUS_GEN)
 	nombre_comercio = models.CharField("Nombre Comercio", max_length=50)
 	domicilio_comercio = models.CharField("Domicilio", max_length=50,
-										 blank=True, null=True)
+									blank=True, null=True)
 	codigo_postal = models.CharField("Código Postal*", max_length=5,
 								  blank=True, null=True)
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
-									 verbose_name="Provincia*",
-									 blank=True, null=True)
+									verbose_name="Provincia*",
+									blank=True, null=True)
 	id_localidad = models.ForeignKey(Localidad, on_delete=models.PROTECT,
-									 verbose_name="Localidad*",
-									 blank=True, null=True)
+									verbose_name="Localidad*",
+									blank=True, null=True)
 	id_tipo_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT, 
-								 verbose_name="Tipo IVA",
-								 blank=True, null=True)
+									verbose_name="Tipo IVA",
+									blank=True, null=True)
 	cuit = models.IntegerField("C.U.I.T.", unique=True)
 	telefono_comercio = models.CharField("Teléfono", max_length=15)
 	movil_comercio = models.CharField("Móvil", max_length=15, 
-										null=True, blank=True)
+									null=True, blank=True)
 	email_comercio = models.EmailField("Correo", max_length=50,
-									 blank=True, null=True)
+									blank=True, null=True)
 	id_servicio = models.ForeignKey(Servicio, 
 									on_delete=models.PROTECT,
 									null=True, blank=True,
 									verbose_name="Servicio*")
 	pago = models.IntegerField("Forma de Pago*", 
-										  default=1,
-										  choices=PAGO_COMERCIO)
+									default=1,
+									choices=PAGO_COMERCIO)
 	bonificacion_comercio = models.DecimalField("Bonificación en %", max_digits=6, 
-							decimal_places=2, default=0.00,null=True, blank=True,
-							validators=[MinValueValidator(0), MaxValueValidator(999.99)])
+									decimal_places=2, 
+									default=0.00,null=True, blank=True,
+									validators=[MinValueValidator(0), 
+					 					MaxValueValidator(999.99)])
 	gasto_adm_comercio = models.DecimalField("Gastos en %", max_digits=6, 
-							decimal_places=2, default=0.00,null=True, blank=True,
-							validators=[MinValueValidator(0), MaxValueValidator(999.99)])
+									decimal_places=2, default=0.00,
+									null=True, blank=True,
+									validators=[MinValueValidator(0), 
+					 					MaxValueValidator(999.99)])
 	
 	observacion_comercio = models.TextField("Observaciones", blank=True, 
-											null=True)
+									null=True)
 
 	class Meta:
 		db_table = 'comercio'

@@ -38,7 +38,6 @@ class SolcitudVale(ModeloBaseGenerico):
 		verbose_name_plural = ('Solicitudes de Vales')
 		ordering = ['id_solicitud_vale']
 												
-
 	def clean(self):
 		super().clean()
 		errors = {}
@@ -81,23 +80,23 @@ class SolcitudVale(ModeloBaseGenerico):
 class Vale(ModeloBaseGenerico):
 	id_vale = models.AutoField(primary_key=True)
 	estatus_vale = models.BooleanField("Estatus*", default=False, 
-									choices=ESTATUS_GEN)
+								choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Socio*")
+								null=True, blank=True,
+								verbose_name="Socio*")
 	id_comercio = models.ForeignKey(Comercio, on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Comercio*")
+								null=True, blank=True,
+								verbose_name="Comercio*")
 	id_plan = models.ForeignKey(Plan, on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Plan*")
+								null=True, blank=True,
+								verbose_name="Plan*")
 	monto_vale = models.DecimalField("Monto Vale*", 
-									max_digits=15, decimal_places=2,
-									default=0.00)
+								max_digits=15, decimal_places=2,
+								default=0.00)
 	estado_vale = models.IntegerField("Estado Vale*", 
-									default=1, choices=SOLICITUD_VALE)
+								default=1, choices=SOLICITUD_VALE)
 	fecha_vale = models.DateField("Fecha Compra*", 
-									null=True, blank=True)
+								null=True, blank=True)
 	
 	class Meta:
 		db_table = 'vale'
@@ -107,3 +106,41 @@ class Vale(ModeloBaseGenerico):
 												
 	def __str__(self):
 		return f"{self.id_socio.nombre_socio} - {self.monto_vale}"
+
+	def clean(self):
+		super().clean()
+		errors = {}
+		# Validar que el socio esté activo
+		if self.id_socio and not getattr(self.id_socio, 'estatus_socio', False):
+			errors['id_socio'] = 'El socio seleccionado no está activo.'
+		# Validar que el comercio esté activo
+		if self.id_comercio and not getattr(self.id_comercio, 'estatus_comercio', False):
+			errors['id_comercio'] = 'El comercio seleccionado no está activo.'
+		# Validar que el plan esté activo
+		if self.id_plan and not getattr(self.id_plan, 'estatus_plan', False):
+			errors['id_plan'] = 'El plan seleccionado no está activo.'
+		if errors:
+			raise ValidationError(errors)
+
+	def save(self, *args, **kwargs):
+		# Evitar modificaciones si el registro ya no está en estado Pendiente
+		if self.pk:
+			try:
+				orig = Vale.objects.get(pk=self.pk)
+			except Vale.DoesNotExist:
+				orig = None
+			if orig and orig.estado_vale != 1:
+				# No permitir modificaciones cuando el estado no es Pendiente
+				raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
+
+		# Lógica al cambiar estado
+		# 2 -> Aprobado: guardar fecha y activar estatus
+		if self.estado_vale == 2 or self.estado_vale == 4:
+			self.fecha_vale = date.today()
+			self.estatus_vale = True
+		# 3 -> Rechazado: Anula la compra y desactivar estatus
+		elif self.estado_vale == 3:
+			self.monto_vale = 0.00
+			self.estatus_vale = False
+
+		super(Vale, self).save(*args, **kwargs)
