@@ -77,9 +77,9 @@ class SolcitudVale(ModeloBaseGenerico):
 		return f"{self.id_socio.nombre_socio} - {self.monto_solicitud_vale}"
 	
 
-class Vale(ModeloBaseGenerico):
-	id_vale = models.AutoField(primary_key=True)
-	estatus_vale = models.BooleanField("Estatus*", default=False, 
+class Compra(ModeloBaseGenerico):
+	id_compra = models.AutoField(primary_key=True)
+	estatus_compra = models.BooleanField("Estatus*", default=False, 
 								choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
 								null=True, blank=True,
@@ -90,22 +90,24 @@ class Vale(ModeloBaseGenerico):
 	id_plan = models.ForeignKey(Plan, on_delete=models.CASCADE,
 								null=True, blank=True,
 								verbose_name="Plan*")
-	monto_vale = models.DecimalField("Monto Vale*", 
+	monto_compra = models.DecimalField("Monto Compra*", 
 								max_digits=15, decimal_places=2,
 								default=0.00)
-	estado_vale = models.IntegerField("Estado Vale*", 
+	estado_compra = models.IntegerField("Estado Compra*", 
 								default=1, choices=SOLICITUD_VALE)
-	fecha_vale = models.DateField("Fecha Compra*", 
+	fecha_compra = models.DateField("Fecha Compra*", 
 								null=True, blank=True)
+	autorizacion_compra = models.IntegerField("Autorización Compra*", 
+								default=0)
 	
 	class Meta:
-		db_table = 'vale'
-		verbose_name = ('Vale')
-		verbose_name_plural = ('Vales')
-		ordering = ['id_vale']
+		db_table = 'compra'
+		verbose_name = ('Compra')
+		verbose_name_plural = ('Compras')
+		ordering = ['id_compra']
 												
 	def __str__(self):
-		return f"{self.id_socio.nombre_socio} - {self.monto_vale}"
+		return f"{self.id_socio.nombre_socio} - {self.monto_compra}"
 
 	def clean(self):
 		super().clean()
@@ -126,21 +128,21 @@ class Vale(ModeloBaseGenerico):
 		# Evitar modificaciones si el registro ya no está en estado Pendiente
 		if self.pk:
 			try:
-				orig = Vale.objects.get(pk=self.pk)
-			except Vale.DoesNotExist:
+				orig = Compra.objects.get(pk=self.pk)
+			except Compra.DoesNotExist:
 				orig = None
-			if orig and orig.estado_vale != 1:
+			if orig and orig.estado_compra != 1:
 				# No permitir modificaciones cuando el estado no es Pendiente
 				raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
 
 		# Lógica al cambiar estado
 		# 2 -> Aprobado: guardar fecha y activar estatus
-		if self.estado_vale == 2 or self.estado_vale == 4:
-			self.fecha_vale = date.today()
-			self.estatus_vale = True
+		if self.estado_compra == 2 or self.estado_compra == 4:
+			self.fecha_compra = date.today()
+			self.estatus_compra = True
 		# 3 -> Rechazado: Anula la compra y desactivar estatus
-		elif self.estado_vale == 3:
-			self.monto_vale = 0.00
-			self.estatus_vale = False
+		elif self.estado_compra == 3:
+			self.monto_compra = 0.00
+			self.estatus_compra = False
 
-		super(Vale, self).save(*args, **kwargs)
+		super(Compra, self).save(*args, **kwargs)

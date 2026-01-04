@@ -1,17 +1,17 @@
-# vales\apps\maestros\views\vale_views.py
+# vales\apps\maestros\views\compra_views.py
 from django.urls import reverse_lazy
 from .cruds_views_generics import *
-from ..models.vale_models import Vale
-from ..forms.vale_forms import ValeForm
+from ..models.vale_models import Compra
+from ..forms.compra_forms import CompraForm
 from entorno.constantes_base import SOLICITUD_VALE
 
 
 class ConfigViews():
 	# Modelo
-	model = Vale
+	model = Compra
 
 	# Formulario asociado al modelo
-	form_class = ValeForm
+	form_class = CompraForm
 	
 	# Aplicación asociada al modelo
 	app_label = model._meta.app_label
@@ -57,7 +57,7 @@ class ConfigViews():
 
 
 class DataViewList():
-	search_fields = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio', 'estado_vale']
+	search_fields = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio', 'estado_compra']
 
 	# Ordenar por el nombre del comercio y por la descripción del plan
 	ordering = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio']
@@ -65,27 +65,27 @@ class DataViewList():
 	paginate_by = 8
 	
 	table_headers = {
-		'estatus_vale': (1, 'Estatus'),
-		'id_vale': (1, 'ID Vale'),
+		'estatus_compra': (1, 'Estatus'),
+		'id_compra': (1, 'ID Compra'),
 		'id_socio': (2, 'Nombre Socio'),
 		'id_comercio': (2, 'Comercio'),
-		'monto_vale': (2, 'Monto Vale'),
-		'estado_vale': (2, 'Estado Vale'),
+		'monto_compra': (2, 'Monto Compra'),
+		'estado_compra': (2, 'Estado Compra'),
 		'acciones': (1, 'Acciones'),
 	}
 
 	table_data = [
-		{'field_name': 'estatus_vale', 'date_format': None},
-		{'field_name': 'id_vale', 'date_format': None},
+		{'field_name': 'estatus_compra', 'date_format': None},
+		{'field_name': 'id_compra', 'date_format': None},
 		{'field_name': 'id_socio', 'date_format': None},
 		{'field_name': 'id_comercio', 'date_format': None},
-		{'field_name': 'monto_vale', 'date_format': None},
-		{'field_name': 'estado_vale', 'date_format': None},
+		{'field_name': 'monto_compra', 'date_format': None},
+		{'field_name': 'estado_compra', 'date_format': None},
 	]
 
 
-# Vale List - Inicio
-class ValeListView(MaestroListView):
+# Compra List - Inicio
+class CompraListView(MaestroListView):
 	model = ConfigViews.model
 	template_name = ConfigViews.template_list
 	context_object_name = ConfigViews.context_object_name
@@ -147,8 +147,8 @@ class ValeListView(MaestroListView):
 	}
 
 
-# Vale Nuevo - Inicio
-class ValeCreateView(MaestroCreateView):
+# Compra Nuevo - Inicio
+class CompraCreateView(MaestroCreateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -165,8 +165,8 @@ class ValeCreateView(MaestroCreateView):
 	# }
 
 
-# Vale Update
-class ValeUpdateView(MaestroUpdateView):
+# Compra Update
+class CompraUpdateView(MaestroUpdateView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	form_class = ConfigViews.form_class
@@ -182,8 +182,8 @@ class ValeUpdateView(MaestroUpdateView):
 	# }
 
 
-# Vale Delete
-class ValeDeleteView (MaestroDeleteView):
+# Compra Delete
+class CompraDeleteView (MaestroDeleteView):
 	model = ConfigViews.model
 	list_view_name = ConfigViews.list_view_name
 	template_name = ConfigViews.template_delete

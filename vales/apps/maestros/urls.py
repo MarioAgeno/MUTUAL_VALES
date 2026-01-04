@@ -18,7 +18,7 @@ from .views.parametro_views import *
 from .views.plan_comercio_views import *
 from .views.solicitud_adhesion_views import *
 from .views.solicitud_vale_views import *
-from .views.vale_views import *
+from .views.compra_views import *
 
 #-- Otras rutas.
 from .views.consulta_views_maestros import filtrar_localidad
@@ -114,11 +114,11 @@ urlpatterns = [
 	path('solicitud_vale/<int:pk>/editar/', SolicitudValeUpdateView.as_view(), name='solicitud_vale_update'),
 	path('solicitud_vale/<int:pk>/eliminar/', SolicitudValeDeleteView.as_view(), name='solicitud_vale_delete'),
 
-	#-- Vales.
-	path('vale/', ValeListView.as_view(), name='vale_list'),
-	path('vale/nueva/', ValeCreateView.as_view(), name='vale_create'),
-	path('vale/<int:pk>/editar/', ValeUpdateView.as_view(), name='vale_update'),
-	path('vale/<int:pk>/eliminar/', ValeDeleteView.as_view(), name='vale_delete'),
+	#-- Compras.
+	path('compra/', CompraListView.as_view(), name='compra_list'),
+	path('compra/nueva/', CompraCreateView.as_view(), name='compra_create'),
+	path('compra/<int:pk>/editar/', CompraUpdateView.as_view(), name='compra_update'),
+	path('compra/<int:pk>/eliminar/', CompraDeleteView.as_view(), name='compra_delete'),
 
 	#-- Otras rutas.
 	path('filtrar-localidad/', filtrar_localidad, name='filtrar_localidad'),

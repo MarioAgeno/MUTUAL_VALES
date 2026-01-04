@@ -38,23 +38,23 @@
 												class="accordion-button py-2 " 
 												type="button" 
 												data-bs-toggle="collapse" 
-												data-bs-target="#Vales_Socios" 
+												data-bs-target="#Compras_Socios" 
 												aria-expanded="true" 
-												aria-controls="Vales_Socios">
-												<strong>Vales Socios</strong>
+												aria-controls="Compras_Socios">
+												<strong>Compras Socios</strong>
 											</button>
 										</h2>
 										<div class="accordion-collapse collapse show"
-											id="Vales_Socios">
+											id="Compras_Socios">
 											<div class="accordion-body bg-secondary-subtle">
 												
 												<div class="row">
 													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
-															{{ form.estatus_vale.label }}
+															{{ form.estatus_compra.label }}
 														</label>
-														{{ form.estatus_vale }}
+														{{ form.estatus_compra }}
 													</div>
 												</div>										
 												<div class="row">
@@ -84,25 +84,32 @@
 													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
-															{{ form.monto_vale.label }}
+															{{ form.monto_compra.label }}
 														</label>
-														{{ form.monto_vale }}
+														{{ form.monto_compra }}
 													</div>
 												</div>										
 												<div class="row">
 													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
-															{{ form.estado_vale.label }}
+															{{ form.estado_compra.label }}
 														</label>
-														{{ form.estado_vale }}
+														{{ form.estado_compra }}
 													</div>
 													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
-															{{ form.fecha_vale.label }}
+															{{ form.fecha_compra.label }}
 														</label>
-														{{ form.fecha_vale }}
+														{{ form.fecha_compra }}
+													</div>
+
+													<div class="col-md-2">
+														<label class="form-label text-primary mb-0">
+															{{ form.autorizacion_compra.label }}
+														</label>
+														{{ form.autorizacion_compra }}
 													</div>
 												</div>
 											</div>

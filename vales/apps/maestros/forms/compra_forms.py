@@ -1,20 +1,20 @@
-# vales\apps\maestros\forms\solicitud_vale_forms.py
+# vales\apps\maestros\forms\compra_forms.py
 from django import forms
 from django.core.exceptions import ValidationError
 from .crud_forms_generics import CrudGenericForm
-from ..models.vale_models import Vale
+from ..models.vale_models import Compra
 from diseno_base.diseno_bootstrap import (
 	formclasstext, formclassselect, formclassdate)
 
 
-class ValeForm(CrudGenericForm):
+class CompraForm(CrudGenericForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		# Mostrar sólo socios y comercios activos en los selects
 		if 'id_socio' in self.fields:
-			self.fields['id_socio'].queryset = Vale._meta.get_field('id_socio').related_model.objects.filter(estatus_socio=True)
+			self.fields['id_socio'].queryset = Compra._meta.get_field('id_socio').related_model.objects.filter(estatus_socio=True)
 		if 'id_comercio' in self.fields:
-			self.fields['id_comercio'].queryset = Vale._meta.get_field('id_comercio').related_model.objects.filter(estatus_comercio=True)
+			self.fields['id_comercio'].queryset = Compra._meta.get_field('id_comercio').related_model.objects.filter(estatus_comercio=True)
 
 	def clean(self):
 		cleaned = super().clean()
@@ -30,11 +30,11 @@ class ValeForm(CrudGenericForm):
 		return cleaned
 
 	class Meta:
-		model = Vale
+		model = Compra
 		fields = '__all__'
 
 		widgets = {
-			'estatus_vale':
+			'estatus_compra':
 				forms.Select(attrs={**formclassselect}),
 			'id_socio':
 				forms.Select(attrs={**formclassselect}),
@@ -42,13 +42,15 @@ class ValeForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'id_plan':
 				forms.Select(attrs={**formclassselect}),
-			'monto_vale':
+			'monto_compra':
 				forms.NumberInput(attrs={**formclasstext}),
-			'estado_vale':
+			'estado_compra':
 				forms.Select(attrs={**formclassselect}),
-			'monto_vale':
+			'monto_compra':
 				forms.NumberInput(attrs={**formclasstext}),
-			'fecha_vale':
+			'fecha_compra':
 				forms.TextInput(attrs={'type':'date', **formclassdate, 'readonly': True}),
+			'autorizacion_compra':
+				forms.NumberInput(attrs={**formclasstext}),
 		}
     

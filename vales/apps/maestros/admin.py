@@ -4,7 +4,7 @@ from django.contrib import admin
 from .models.socio_models import Socio, SolicitudAdhesion
 from .models.comercio_models import Comercio, PlanComercio
 from .models.sucursal_models import Sucursal
-from .models.vale_models import SolcitudVale, Vale
+from .models.vale_models import SolcitudVale, Compra
 from .models.base_models import *
 
 # Registramos los modelos independientes
@@ -14,7 +14,7 @@ admin.site.register(Sucursal)
 admin.site.register(PlanComercio)
 admin.site.register(SolicitudAdhesion)
 admin.site.register(SolcitudVale)
-admin.site.register(Vale)
+admin.site.register(Compra)
 
 # Registramos los modelos base
 admin.site.register(Servicio)

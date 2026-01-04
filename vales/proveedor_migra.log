@@ -1,0 +1,5 @@
+2026-01-03 22:19:47,036 - INFO - Iniciando migración de proveedores
+2026-01-03 22:19:47,045 - INFO - Precargando relaciones en memoria...
+2026-01-03 22:19:47,050 - INFO - Relaciones precargadas en memoria
+2026-01-03 22:19:47,077 - INFO - DBF cargado en memoria. Total registros: 169
+2026-01-03 22:19:47,165 - INFO - Migración completada. Total registros procesados: 169/169. Tiempo: 0.13 segundos
