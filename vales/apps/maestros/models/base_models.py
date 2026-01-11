@@ -147,7 +147,7 @@ class Empresa(ModeloBaseGenerico):
 								  verbose_name="Provincia*")
 	id_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT, 
 						 verbose_name="Tipo I.V.A.", null=True, blank=True)
-	cuit = models.IntegerField("C.U.I.T.*", )
+	cuit = models.BigIntegerField("C.U.I.T.*", )
 	ingresos_bruto = models.CharField("Ing. Bruto*", max_length=15)
 	inicio_actividad = models.DateField("Inicio de actividad*")
 	cbu = models.CharField("CBU Bancaria*", max_length=22)
@@ -196,13 +196,13 @@ class Empresa(ModeloBaseGenerico):
 class Parametro(ModeloBaseGenerico):
 	id_parametro = models.AutoField(primary_key=True)  # Clave primaria
 	estatus_parametro = models.BooleanField("Estatus", default=True,
-											choices=ESTATUS_GEN)  # Estatus del parámetro
+									choices=ESTATUS_GEN)  # Estatus del parámetro
 	id_empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE,
-								   verbose_name="Empresa")
+								    verbose_name="Empresa")
 	interes = models.DecimalField("Intereses(%)", max_digits=5,
-								decimal_places=2, default=0.00, blank=True)
+									decimal_places=2, default=0.00, blank=True)
 	fecha_vencimiento = models.DateField("Fecha Vencimiento", default=None,
-                               null=True, blank=True)
+                               		null=True, blank=True)
 
 	
 	class Meta:

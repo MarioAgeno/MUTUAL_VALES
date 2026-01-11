@@ -10,14 +10,14 @@ from entorno.constantes_base import ESTATUS_GEN
 class Sucursal(ModeloBaseGenerico):
 	id_sucursal = models.AutoField(primary_key=True)
 	estatus_sucursal = models.BooleanField("Estatus", default=True,
-									choices=ESTATUS_GEN)
+								choices=ESTATUS_GEN)
 	nombre_sucursal = models.CharField("Nombre sucursal", max_length=50)
 	domicilio_sucursal = models.CharField("Domicilio", max_length=50)
 	codigo_postal = models.CharField("Código Postal*", max_length=5)
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
-								  	verbose_name="Provincia")
+								verbose_name="Provincia")
 	id_localidad = models.ForeignKey(Localidad, on_delete=models.PROTECT, 
-								  	verbose_name="Localidad")
+								verbose_name="Localidad")
 	telefono_sucursal = models.CharField("Teléfono", max_length=15)
 	email_sucursal = models.EmailField("Correo", max_length=50)
 	inicio_actividad = models.DateField("Inicio actividad")

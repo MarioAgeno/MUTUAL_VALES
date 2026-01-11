@@ -18,7 +18,7 @@ class Comercio(ModeloBaseGenerico):
 	domicilio_comercio = models.CharField("Domicilio", max_length=50,
 									blank=True, null=True)
 	codigo_postal = models.CharField("Código Postal*", max_length=5,
-								  blank=True, null=True)
+								    blank=True, null=True)
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
 									verbose_name="Provincia*",
 									blank=True, null=True)
@@ -28,7 +28,7 @@ class Comercio(ModeloBaseGenerico):
 	id_tipo_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT, 
 									verbose_name="Tipo IVA",
 									blank=True, null=True)
-	cuit = models.IntegerField("C.U.I.T.", unique=True)
+	cuit = models.BigIntegerField("C.U.I.T.", unique=True)
 	telefono_comercio = models.CharField("Teléfono", max_length=15)
 	movil_comercio = models.CharField("Móvil", max_length=15, 
 									null=True, blank=True)
