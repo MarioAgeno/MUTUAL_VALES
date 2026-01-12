@@ -79,8 +79,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'vales.wsgi.application'
 
-
-# Database
+'''
+# Database SQlite3
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
@@ -89,6 +89,19 @@ DATABASES = {
         'NAME': path.join(BASE_DIR, 'data', 'db_vales.db'),
     }
 }
+'''
+# Definición de la base de datos PostgreSQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'vales_db',  # Nombre de la DB creada en PostgreSQL
+        'USER': 'postgres',  # Usuario creado
+        'PASSWORD': 'maasoft',  # Contraseña
+        'HOST': 'localhost',  # O la IP si es remoto
+        'PORT': '5432',  # Puerto por defecto de PostgreSQL
+    }
+}
+
 
 
 # Password validation
@@ -108,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

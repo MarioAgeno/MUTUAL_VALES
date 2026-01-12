@@ -22,7 +22,7 @@ from apps.maestros.models.base_models import Servicio
 
 # Configurar logging
 logging.basicConfig(
-    filename=os.path.join(BASE_DIR, 'proveedor_migra.log'),
+    filename=os.path.join(BASE_DIR, 'comercio_migra.log'),
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
@@ -47,19 +47,16 @@ def print_progress(current, total, start_time, last_print_time):
     return time.time()
 
 def reset_proveedor():
-    """Elimina los datos existentes en la tabla Proveedor y resetea su ID"""
+    """Elimina los datos existentes en la tabla Comercio"""
     print("\nInicializando migración...")
     try:
         with transaction.atomic():
             count = Comercio.objects.count()
             if count > 0:
                 print(f"Eliminando {count:,} registros existentes...")
-                Comercio.objects.all().delete()
-                logger.info(f"Eliminados {count} registros existentes de Proveedor")
-            
-            if 'sqlite' in connection.settings_dict['ENGINE']:
                 with connection.cursor() as cursor:
-                    cursor.execute("DELETE FROM sqlite_sequence WHERE name='proveedor';")
+                    cursor.execute("DELETE FROM comercio")
+                logger.info(f"Eliminados {count} registros existentes de Comercio")
             print("Base de datos preparada para la migración.")
     except Exception as e:
         logger.error(f"Error en reset_proveedor: {e}")
@@ -77,16 +74,22 @@ def precargar_relaciones():
     # Precargar valores por defecto con manejo de excepciones
     # Construir mapa de servicios por número y por descripción corta
     try:
-        for s in Servicio.objects.all():
-            key_num = str(s.numero_servicio) if s.numero_servicio is not None else ''
-            if key_num:
-                relaciones['servicios'][key_num].append(s.id_servicio)
-            key_desc = (s.descripcion_servicio or '')[:5].upper()
-            if key_desc:
-                relaciones['servicios'][key_desc].append(s.id_servicio)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_servicio, numero_servicio, descripcion_servicio FROM servicio WHERE estatus_servicio = 1")
+            servicios = cursor.fetchall()
+            for s in servicios:
+                id_servicio, numero_servicio, descripcion_servicio = s
+                key_num = str(numero_servicio) if numero_servicio is not None else ''
+                if key_num:
+                    relaciones['servicios'][key_num].append(id_servicio)
+                key_desc = (descripcion_servicio or '')[:5].upper()
+                if key_desc:
+                    relaciones['servicios'][key_desc].append(id_servicio)
 
-        default = Servicio.objects.filter(estatus_servicio=True).first()
-        relaciones['default_servicio'] = default.id_servicio if default else None
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT TOP 1 id_servicio FROM servicio WHERE estatus_servicio = 1")
+            default_row = cursor.fetchone()
+            relaciones['default_servicio'] = default_row[0] if default_row else None
     except Exception as e:
         logger.warning(f"No fue posible precargar servicios: {e}")
         relaciones['default_servicio'] = None
@@ -106,11 +109,11 @@ def procesar_lote(records, cache, batch_start):
     
     for idx, record in enumerate(records):
         try:
-            # Convertir CODIGO a entero
+            # Convertir ID a entero
             try:
-                codigo_origen = int(float(record.get('CODIGO', 0)))
+                codigo_origen = int(float(record.get('ID', 0)))
             except (ValueError, TypeError):
-                logger.warning(f"Valor inválido en CODIGO: {record.get('CODIGO')}. Registro omitido.")
+                logger.warning(f"Valor inválido en ID: {record.get('ID')}. Registro omitido.")
                 continue
 
             # Servicios
@@ -137,19 +140,23 @@ def procesar_lote(records, cache, batch_start):
             telefono = '3492000000'
             email = ''
             nota = ''
-            pago_comercio = record.get('PAGO', 1)
-            bonificacion = record.get('BONIFICA', 1)
-            gastos = record.get('GASTOADM', 1)
+            id_provincia = 13  # Valor por defecto
+            id_localidad = 1170  # Valor por defecto
+            id_tipo_iva = 4  # Valor por defecto
+            pago_comercio = record.get('FPAGO', 1) if record.get('FPAGO') is not None else 1
+            bonificacion = record.get('BONIFICA') if record.get('BONIFICA') is not None else 0.00
+            gastos = record.get('GASTOADM') if record.get('GASTOADM') is not None else 0.00
 
             # Crear instancia de Proveedor
             proveedor = Comercio(
+                id_user_id=1,
                 estatus_comercio=True,
                 nombre_comercio=nombre,
                 domicilio_comercio=domicilio,
                 codigo_postal=codigo_postal,
-                id_provincia_id=13,
-                id_localidad_id=1170,
-                id_tipo_iva_id=2,
+                id_provincia_id=id_provincia,
+                id_localidad_id=id_localidad,
+                id_tipo_iva_id=id_tipo_iva,
                 cuit=cuit,
                 telefono_comercio=telefono,
                 movil_comercio=None,

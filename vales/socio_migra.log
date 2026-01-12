@@ -1,9 +1,10 @@
-2026-01-03 22:19:50,094 - INFO - Iniciando migración de socios...
-2026-01-03 22:19:50,155 - INFO - Precargando relaciones en memoria...
-2026-01-03 22:19:50,772 - INFO - Relaciones precargadas en memoria
-2026-01-03 22:19:51,224 - INFO - DBF cargado en memoria. Total registros: 2281
-2026-01-03 22:19:52,428 - WARNING - CUIT duplicado: 20000000001. Registro omitido.
-2026-01-03 22:19:52,688 - WARNING - CUIT duplicado: 23327261754. Registro omitido.
-2026-01-03 22:19:52,720 - ERROR - Error procesando registro 7604: invalid literal for int() with base 10: '201660000000.0'
-2026-01-03 22:19:52,722 - ERROR - Error procesando registro 7621: invalid literal for int() with base 10: '273030000000.0'
-2026-01-03 22:19:52,884 - INFO - Migración completada. Total registros procesados: 2277/2281. Tiempo: 2.79 segundos
+2026-01-11 21:47:55,755 - INFO - Iniciando migración de socios...
+2026-01-11 21:47:55,922 - INFO - Eliminados 436 registros existentes de Socio
+2026-01-11 21:47:55,951 - INFO - Precargando relaciones en memoria...
+2026-01-11 21:47:56,555 - INFO - Relaciones precargadas en memoria
+2026-01-11 21:47:57,130 - INFO - DBF cargado en memoria. Total registros: 2281
+2026-01-11 21:47:59,107 - WARNING - CUIT duplicado: 20000000001. Registro omitido.
+2026-01-11 21:47:59,374 - WARNING - CUIT duplicado: 23327261754. Registro omitido.
+2026-01-11 21:47:59,432 - ERROR - Error procesando registro 7604: invalid literal for int() with base 10: '201660000000.0'
+2026-01-11 21:47:59,437 - ERROR - Error procesando registro 7621: invalid literal for int() with base 10: '273030000000.0'
+2026-01-11 21:47:59,762 - INFO - Migración completada. Total registros procesados: 2277/2281. Tiempo: 4.01 segundos
