@@ -1,9 +1,11 @@
 # vales\apps\maestros\views\compra_views.py
 from django.urls import reverse_lazy
 from .cruds_views_generics import *
-from ..models.vale_models import Compra
+from ..models.vale_models import Compra, SolicitudVale
 from ..forms.compra_forms import CompraForm
 from entorno.constantes_base import SOLICITUD_VALE
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 class ConfigViews():
@@ -24,7 +26,7 @@ class ConfigViews():
 	model_string = model.__name__.lower()  #-- Usar esta forma cuando el modelo esté compuesto de una sola palabra: Ej. Color.
 	
 	#-- Usar esta forma cuando el modelo esté compuesto por más de una palabra: Ej. TipoCambio colocar "tipo_cambio".
-	#model_string = "solcitud_vale" 
+	#model_string = "solicitud_vale" 
 	
 	# Permisos
 	permission_add = f"{app_label}.add_{model.__name__.lower()}"
@@ -197,3 +199,21 @@ class CompraDeleteView (MaestroDeleteView):
 	# 	"list_view_name" : ConfigViews.list_view_name,
 	# 	"mensaje": "Estás seguro de eliminar el Registro"
 	# }
+
+#-- Vista para obtener datos mínimos de la SolicitudVale
+def solicitud_vale_info(request, pk):
+    """
+    Devuelve datos mínimos para autocompletar la Compra al seleccionar una SolicitudVale.
+    """
+    sv = get_object_or_404(
+        SolicitudVale.objects.select_related("id_socio", "id_comercio"),
+        pk=pk
+    )
+
+    return JsonResponse({
+        "id_socio": sv.id_socio_id,
+        "socio_text": str(sv.id_socio) if sv.id_socio_id else "",
+        "id_comercio": sv.id_comercio_id,
+        "comercio_text": str(sv.id_comercio) if sv.id_comercio_id else "",
+        "importe_aprobado": float(sv.limite_aprobado) if sv.limite_aprobado else 0
+    })

@@ -58,6 +58,12 @@
 													</div>
 												</div>										
 												<div class="row">
+													<div class="col-md-3">
+														<label class="form-label text-primary mb-0">
+															{{ form.id_solicitud_vale.label }}
+														</label>
+														{{ form.id_solicitud_vale }}
+													</div>
 													
 													<div class="col-md-3">
 														<label class="form-label text-primary mb-0">
@@ -133,6 +139,56 @@
 			</main>
 		</div>
 	{% endblock principalcomponent %}
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const solicitudSel = document.getElementById("id_id_solicitud_vale");
+  const socioSel     = document.getElementById("id_id_socio");
+  const comercioSel  = document.getElementById("id_id_comercio");
+  const importeInput = document.getElementById("id_monto_compra");
+
+  if (!solicitudSel || !socioSel || !comercioSel || !importeInput) return;
+
+  const urlBase = "{% url 'solicitud_vale_info' 0 %}".replace("/0/", "/");
+
+  async function cargarDatosSolicitud(svId) {
+    if (!svId) return;
+
+    try {
+      const resp = await fetch(urlBase + svId + "/", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      });
+
+      if (!resp.ok) return;
+      const data = await resp.json();
+
+      if (data.id_socio) socioSel.value = String(data.id_socio);
+      if (data.id_comercio) comercioSel.value = String(data.id_comercio);
+
+      // 👉 completar importe con el aprobado
+      if (data.importe_aprobado) {
+        importeInput.value = data.importe_aprobado;
+      }
+
+      socioSel.dispatchEvent(new Event("change"));
+      comercioSel.dispatchEvent(new Event("change"));
+
+    } catch (e) {
+      console.error("Error AJAX solicitud_vale_info:", e);
+    }
+  }
+
+  solicitudSel.addEventListener("change", () => {
+    cargarDatosSolicitud(solicitudSel.value);
+  });
+
+  if (solicitudSel.value) {
+    cargarDatosSolicitud(solicitudSel.value);
+  }
+});
+</script>
+	
+
 {% endblock maincomponent %}
 <!-- -------------------------------------------------------------------- -->
 {% block modals %}

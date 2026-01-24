@@ -69,8 +69,6 @@ class DataViewList():
 		'nombre_socio': (3, 'Nombre Socio'),
 		'telefono_socio': (1, 'Telefono'),
 		'cuit': (1, 'CUIT'),
-		'limite_credito': (2, 'Límite Crédito'),
-		'disponible_credito': (2, 'Crédito Disponible'),
 		'acciones': (1, 'Acciones'),
 	}
 	
@@ -80,8 +78,6 @@ class DataViewList():
 		{'field_name': 'nombre_socio', 'date_format': None},
 		{'field_name': 'telefono_socio', 'date_format': None},
 		{'field_name': 'cuit', 'date_format': None},
-		{'field_name': 'limite_credito', 'date_format': 'currency'},
-		{'field_name': 'disponible_credito', 'date_format': 'currency'},
 	]
 
 

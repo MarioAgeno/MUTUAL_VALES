@@ -1,17 +1,17 @@
 # vales\apps\maestros\views\solicitud_vale_views.py
 from django.urls import reverse_lazy
 from .cruds_views_generics import *
-from ..models.vale_models import SolcitudVale
-from ..forms.solicitud_vale_forms import SolcitudValeForm
+from ..models.vale_models import SolicitudVale
+from ..forms.solicitud_vale_forms import SolicitudValeForm
 from entorno.constantes_base import SOLICITUD_SOCIO
 
 
 class ConfigViews():
 	# Modelo
-	model = SolcitudVale
+	model = SolicitudVale
 
 	# Formulario asociado al modelo
-	form_class = SolcitudValeForm
+	form_class = SolicitudValeForm
 	
 	# Aplicación asociada al modelo
 	app_label = model._meta.app_label

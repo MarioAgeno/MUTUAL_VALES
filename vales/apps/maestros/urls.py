@@ -119,6 +119,7 @@ urlpatterns = [
 	path('compra/nueva/', CompraCreateView.as_view(), name='compra_create'),
 	path('compra/<int:pk>/editar/', CompraUpdateView.as_view(), name='compra_update'),
 	path('compra/<int:pk>/eliminar/', CompraDeleteView.as_view(), name='compra_delete'),
+	path("compra/solicitud-info/<int:pk>/", solicitud_vale_info, name="solicitud_vale_info"),
 
 	#-- Otras rutas.
 	path('filtrar-localidad/', filtrar_localidad, name='filtrar_localidad'),

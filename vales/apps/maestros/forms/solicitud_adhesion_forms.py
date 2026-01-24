@@ -37,8 +37,6 @@ class SolicitudAdhesionForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'cuit_solicitud_adhesion': 
 				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
-			'limite_credito_solicitud_adhesion': 
-				forms.NumberInput(attrs={**formclasstext}),
 			'movil_solicitud_adhesion': 
 				forms.TextInput(attrs={**formclasstext}),
 			'email_solicitud_adhesion': 

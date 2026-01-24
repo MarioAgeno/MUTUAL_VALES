@@ -2,19 +2,19 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from .crud_forms_generics import CrudGenericForm
-from ..models.vale_models import SolcitudVale
+from ..models.vale_models import SolicitudVale
 from diseno_base.diseno_bootstrap import (
 	formclasstext, formclassselect, formclassdate)
 
 
-class SolcitudValeForm(CrudGenericForm):
+class SolicitudValeForm(CrudGenericForm):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		# Mostrar sólo socios y comercios activos en los selects
 		if 'id_socio' in self.fields:
-			self.fields['id_socio'].queryset = SolcitudVale._meta.get_field('id_socio').related_model.objects.filter(estatus_socio=True)
+			self.fields['id_socio'].queryset = SolicitudVale._meta.get_field('id_socio').related_model.objects.filter(estatus_socio=True)
 		if 'id_comercio' in self.fields:
-			self.fields['id_comercio'].queryset = SolcitudVale._meta.get_field('id_comercio').related_model.objects.filter(estatus_comercio=True)
+			self.fields['id_comercio'].queryset = SolicitudVale._meta.get_field('id_comercio').related_model.objects.filter(estatus_comercio=True)
 
 	def clean(self):
 		cleaned = super().clean()
@@ -30,7 +30,7 @@ class SolcitudValeForm(CrudGenericForm):
 		return cleaned
 
 	class Meta:
-		model = SolcitudVale
+		model = SolicitudVale
 		fields = '__all__'
 
 		widgets = {
@@ -46,6 +46,8 @@ class SolcitudValeForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'limite_aprobado':
 				forms.NumberInput(attrs={**formclasstext}),
+			'consumido_solicitud_vale':
+				forms.NumberInput(attrs={**formclasstext, 'readonly': True}),
 			'fecha_aprobacion':
 				forms.TextInput(attrs={'type':'date', **formclassdate, 'readonly': True}),
 			'id_user':
