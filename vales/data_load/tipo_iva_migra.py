@@ -20,8 +20,9 @@ def reset_tipo_iva():
     TipoIva.objects.all().delete()
     print("Tabla TipoIva limpiada.")
 
-    with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='tipo_iva';")
+    if connection.vendor == 'sqlite3':
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name='tipo_iva';")
     
     print("Secuencia de ID reseteada.")
 

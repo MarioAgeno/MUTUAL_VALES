@@ -21,8 +21,9 @@ def reset_tipo_documento_identidad():
     print("Tabla TipoDocumentoIdentidad limpiada.")
 
     # Reiniciar el autoincremento en SQLite
-    with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='tipo_documento_identidad';") 
+    if connection.vendor == 'sqlite3':
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name='tipo_documento_identidad';") 
         
     print("Secuencia de ID reseteada.")
 

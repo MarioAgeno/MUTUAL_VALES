@@ -48,8 +48,9 @@ def reset_servicio():
     Servicio.objects.all().delete()
 
     # Reiniciar el autoincremento en la base de datos
-    with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='servicio';")
+    if connection.vendor == 'sqlite3':
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name='servicio';")
 
     print("Datos de la tabla Servicio eliminados y autoincremento reseteado.")
 

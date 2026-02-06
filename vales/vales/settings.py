@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': path.join(BASE_DIR, 'data', 'db_vales.db'),
     }
 }
-'''
+
 # Definición de la base de datos PostgreSQL
 DATABASES = {
     'default': {
@@ -101,7 +101,20 @@ DATABASES = {
         'PORT': '5432',  # Puerto por defecto de PostgreSQL
     }
 }
-
+'''
+# Definición de la base de datos SQL Server
+DATABASES = {
+    'default': {
+        'ENGINE': 'mssql',
+        'NAME': 'vales_db', 
+        'HOST': 'NBMARIO\\SQLEXPRESS',
+        'USER': 'sa',
+        'PASSWORD': 'maasoft',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 11 for SQL Server', 
+        },
+    }
+}
 
 
 # Password validation
@@ -168,8 +181,18 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Modelo Usuario personalizado.
 AUTH_USER_MODEL = 'usuarios.User'
 
+'''
 #-- Configuración del locale para Argentina/España.
 try:
     locale.setlocale(locale.LC_ALL, 'es_AR.UTF-8')  # Linux/Mac
 except locale.Error:
     locale.setlocale(locale.LC_ALL, 'spanish')      # Windows como fallback
+'''
+
+# NO tocar LC_ALL porque rompe conversiones DECIMAL con SQL Server/pyodbc.
+# Si necesitás formato de fechas/idioma en UI, resolvelo con Django (LANGUAGE_CODE)
+# o con filtros/formatos, no con LC_ALL del proceso.
+try:
+    locale.setlocale(locale.LC_TIME, 'spanish')   # solo fechas/horas (opcional)
+except locale.Error:
+    pass

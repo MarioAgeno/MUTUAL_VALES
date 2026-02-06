@@ -63,8 +63,8 @@ class Provincia(ModeloBaseGenerico):
 class Localidad(ModeloBaseGenerico):
 	id_localidad = models.AutoField(primary_key=True)
 	estatus_localidad = models.BooleanField("Estatus", default=True,
-											choices=ESTATUS_GEN)
-	nombre_localidad = models.CharField("Nombre Localidad", max_length=30)
+									choices=ESTATUS_GEN)
+	nombre_localidad = models.CharField("Nombre Localidad", max_length=40)
 	codigo_postal = models.CharField("Código Postal", max_length=5)
 	id_provincia = models.ForeignKey('Provincia', on_delete=models.CASCADE,
 									 verbose_name="Provincia")
