@@ -60,6 +60,12 @@
 														</label>
 														{{ form.id_socio }}
 													</div>
+													<div class="col-md-4">
+														<label class="form-label text-primary mb-0">
+															{{ form.nombre_solicitud_adhesion.label }}
+														</label>
+														{{ form.nombre_solicitud_adhesion }}
+													</div>
 												</div>										
 
 												<div class="row">
@@ -69,15 +75,18 @@
 														</label>
 														{{ form.cuit_solicitud_adhesion }}
 													</div>
-													
+													<div class="col-md-2">
+														<label class="form-label text-primary mb-0">
+															{{ form.legajo_solicitud_adhesion.label }}
+														</label>
+														{{ form.legajo_solicitud_adhesion }}
+													</div>													
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
 															{{ form.movil_solicitud_adhesion.label }}
 														</label>
 														{{ form.movil_solicitud_adhesion }}
 													</div>
-												</div>										
-												<div class="row">
 													<div class="col-md-4">
 														<label class="form-label text-primary mb-0">
 															{{ form.email_solicitud_adhesion.label }}
@@ -115,13 +124,14 @@
 											<div class="accordion-body bg-secondary-subtle">
 		
 												<div class="row">
-													<div class="col-md-3">
+													<div class="col-md-4">
 														<label class="form-label text-primary mb-0">
 															{{ form.nombre_socio.label }}
 														</label>
 														{{ form.nombre_socio }}
 													</div>
-						
+												</div>
+												<div class="row">
 													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
 															{{ form.cuit.label }}
@@ -129,14 +139,21 @@
 														{{ form.cuit }}
 													</div>
 						
-													<div class="col-md-3">
+													<div class="col-md-2">
+														<label class="form-label text-primary mb-0">
+															{{ form.legajo.label }}
+														</label>
+														{{ form.legajo }}
+													</div>
+
+													<div class="col-md-2">
 														<label class="form-label text-primary mb-0">
 															{{ form.movil_socio.label }}
 														</label>
 														{{ form.movil_socio }}
 													</div>
 						
-													<div class="col-md-3">
+													<div class="col-md-4">
 														<label class="form-label text-primary mb-0">
 															{{ form.email_socio.label }}
 														</label>

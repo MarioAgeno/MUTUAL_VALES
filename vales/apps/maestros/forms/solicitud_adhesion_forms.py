@@ -16,6 +16,10 @@ class SolicitudAdhesionForm(CrudGenericForm):
         required=False,
         widget=forms.TextInput(attrs={**formclasstext, 'readonly': True})
     )
+    legajo = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={**formclasstext, 'readonly': True})
+    )
     movil_socio = forms.CharField(
 		required=False,
 		widget=forms.TextInput(attrs={**formclasstext, 'readonly': True})
@@ -35,12 +39,16 @@ class SolicitudAdhesionForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'id_socio': 
 				forms.Select(attrs={**formclassselect}),
+			'nombre_solicitud_adhesion': 
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 			'cuit_solicitud_adhesion': 
 				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+			'legajo_solicitud_adhesion': 
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 			'movil_solicitud_adhesion': 
-				forms.TextInput(attrs={**formclasstext}),
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 			'email_solicitud_adhesion': 
-				forms.EmailInput(attrs={**formclasstext}),
+				forms.EmailInput(attrs={**formclasstext, 'readonly': True}),
 			'estado_solicitud_adhesion': 
 				forms.Select(attrs={**formclassselect}),
 		}
@@ -52,6 +60,7 @@ class SolicitudAdhesionForm(CrudGenericForm):
             socio = self.instance.id_socio 
             self.fields['nombre_socio'].initial = socio.nombre_socio
             self.fields['cuit'].initial = socio.cuit
+            self.fields['legajo'].initial = socio.legajo
             self.fields['movil_socio'].initial = socio.movil_socio
             self.fields['email_socio'].initial = socio.email_socio
 

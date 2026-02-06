@@ -68,9 +68,10 @@ class DataViewList():
 		'estatus_solicitud_adhesion': (1, 'Estatus'),
 		'id_solicitud_adhesion': (1, 'ID Solicitud'),
 		'id_socio': (3, 'Nombre Socio'),
-		'cuit_solicitud_adhesion': (2, 'CUIT/CUIL'),
-		'movil_solicitud_adhesion': (2, 'Teléfono Móvil'),
-		'estado_solicitud_adhesion': (2, 'Estado Solicitud'),
+		'cuit_solicitud_adhesion': (1, 'CUIT/CUIL'),
+		'legajo_solicitud_adhesion': (1, 'Legajo'),
+		'movil_solicitud_adhesion': (1, 'Teléfono Móvil'),
+		'estado_solicitud_adhesion': (1, 'Estado Solicitud'),
 		'acciones': (1, 'Acciones'),
 	}
 
@@ -79,6 +80,7 @@ class DataViewList():
 		{'field_name': 'id_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'id_socio', 'date_format': None},
 		{'field_name': 'cuit_solicitud_adhesion', 'date_format': None},
+		{'field_name': 'legajo_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'movil_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'estado_solicitud_adhesion', 'date_format': None},
 	]

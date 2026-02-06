@@ -36,6 +36,8 @@ class SocioForm(CrudGenericForm):
 				forms.TextInput(attrs={**formclasstext}),
 			'cuit': 
 				forms.TextInput(attrs={**formclasstext}),
+			'legajo': 
+				forms.TextInput(attrs={**formclasstext}),
 			'telefono_socio': 
 				forms.TextInput(attrs={**formclasstext}),
 			'telefono2_socio': 

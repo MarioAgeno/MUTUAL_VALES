@@ -69,6 +69,7 @@ class DataViewList():
 		'nombre_socio': (3, 'Nombre Socio'),
 		'telefono_socio': (1, 'Telefono'),
 		'cuit': (1, 'CUIT'),
+		'legajo': (1, 'Legajo'),
 		'acciones': (1, 'Acciones'),
 	}
 	
@@ -78,6 +79,7 @@ class DataViewList():
 		{'field_name': 'nombre_socio', 'date_format': None},
 		{'field_name': 'telefono_socio', 'date_format': None},
 		{'field_name': 'cuit', 'date_format': None},
+		{'field_name': 'legajo', 'date_format': None},
 	]
 
 

@@ -37,6 +37,7 @@ class Socio(ModeloBaseGenerico):
 									verbose_name="Tipo Doc. Identidad*")
 	numero_documento = models.IntegerField("Número doc.*", null=True, blank=True)
 	cuit = models.BigIntegerField("CUIT/CUIL*", unique=True, null=True, blank=True)
+	legajo = models.BigIntegerField("Legajo*", unique=True, null=True, blank=True)
 	telefono_socio = models.CharField("Teléfono*", max_length=15)
 	telefono2_socio = models.CharField("Teléfono Alternativo", max_length=15,
 									null=True, blank=True)
@@ -119,7 +120,11 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 									choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
 									verbose_name="Socio*")
+	nombre_solicitud_adhesion = models.CharField("Nombre Socio*", max_length=50,
+									null=True, blank=True)
 	cuit_solicitud_adhesion = models.BigIntegerField("CUIT/CUIL*", 
+									null=True, blank=True)
+	legajo_solicitud_adhesion = models.BigIntegerField("Legajo*", 
 									null=True, blank=True)
 	movil_solicitud_adhesion = models.CharField("Móvil*", max_length=15, 
 									null=True, blank=True)
