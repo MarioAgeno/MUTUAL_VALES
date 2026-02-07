@@ -111,7 +111,7 @@ DATABASES = {
         'USER': 'sa',
         'PASSWORD': 'maasoft',
         'OPTIONS': {
-            'driver': 'ODBC Driver 11 for SQL Server', 
+            'driver': 'ODBC Driver 17 for SQL Server', 
         },
     }
 }
