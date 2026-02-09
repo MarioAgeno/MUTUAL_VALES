@@ -6,7 +6,6 @@ from django.dispatch import receiver
 
 from entorno.constantes_base import SI_NO
 
-
 class User(AbstractUser):
 	email = models.EmailField("Correo electrónico")
 	email_alt = models.EmailField("Correo alternativo", max_length=50,
@@ -27,3 +26,4 @@ def set_user_active(sender, instance, created, **kwargs):
 	if created and not instance.is_active:
 		instance.is_active = True
 		instance.save()
+		

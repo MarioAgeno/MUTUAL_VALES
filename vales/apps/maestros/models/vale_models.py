@@ -213,11 +213,12 @@ class Compra(ModeloBaseGenerico):
 			)
 
 			# Si el vale quedó consumido, esta compra pasa a estado 4 (Consumido)
-			Compra.objects.filter(pk=self.pk).update(
-				estado_compra=4,
-				estatus_compra=True,
-				fecha_compra=date.today()
-			)
-			self.estado_compra = 4
-			self.estatus_compra = True
-			self.fecha_compra = date.today()
+			if vale_consumido:
+				Compra.objects.filter(pk=self.pk).update(
+					estado_compra=4,
+					estatus_compra=True,
+					fecha_compra=date.today()
+				)
+				self.estado_compra = 4
+				self.estatus_compra = True
+				self.fecha_compra = date.today()
