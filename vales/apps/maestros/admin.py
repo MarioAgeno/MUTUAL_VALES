@@ -6,6 +6,7 @@ from .models.comercio_models import Comercio, PlanComercio
 from .models.sucursal_models import Sucursal
 from .models.vale_models import SolicitudVale, Compra
 from .models.base_models import *
+from .models.cuenta_comercio_models import CuentaComercio    
 
 # Registramos los modelos independientes
 admin.site.register(Socio)
@@ -25,4 +26,11 @@ admin.site.register(TipoIva)
 admin.site.register(Empresa)
 admin.site.register(Parametro)
 admin.site.register(Plan)
+
+# Registar cuenta Comercio
+@admin.register(CuentaComercio)
+class CuentaComercioAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "comercio", "activo")
+    search_fields = ("user__username", "user__email", "comercio__nombre_comercio")
+    list_filter = ("activo",)
 

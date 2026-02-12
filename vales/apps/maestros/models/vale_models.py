@@ -1,8 +1,9 @@
 # vales\apps\maestros\models\vale_models.py
 from django.db import models
 from django.core.exceptions import ValidationError
-import re
 from datetime import date
+
+
 
 from .base_gen_models import ModeloBaseGenerico
 from .base_models import Plan
@@ -104,7 +105,9 @@ class Compra(ModeloBaseGenerico):
 								null=True, blank=True)
 	autorizacion_compra = models.IntegerField("Autorización Compra*", 
 								default=0)
-	
+	idempotency_key = models.CharField("Idempotency Key", 
+					max_length=36, null=True, blank=True, editable=False)
+
 	class Meta:
 		db_table = 'compra'
 		verbose_name = ('Compra')
@@ -112,7 +115,9 @@ class Compra(ModeloBaseGenerico):
 		ordering = ['id_compra']
 												
 	def __str__(self):
-		return f"{self.id_socio.nombre_socio} - {self.monto_compra}"
+		socio = self.id_socio.nombre_socio if self.id_socio else "Sin socio"
+		return f"{socio} - {self.monto_compra}"
+
 
 	def clean(self):
 		super().clean()
