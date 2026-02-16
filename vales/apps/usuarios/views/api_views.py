@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..serializers import RegistroSocioSerializer
 from ...maestros.models.socio_models import Socio, SolicitudAdhesion 
@@ -107,4 +109,42 @@ class RegistroSocioView(APIView):
                 "cuit": socio.cuit,
             }
         }, status=status.HTTP_201_CREATED)
+
+
+class CurrentUserView(APIView):
+    """
+    Endpoint que devuelve los datos del usuario actual autenticado
+    con información adicional del socio asociado.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+        
+        # Response base con datos del usuario
+        response_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "telefono": user.telefono or "",
+        }
+        
+        # Intentar obtener la cuenta socio asociada
+        try:
+            cuenta_socio = user.cuenta_socio
+            socio = cuenta_socio.socio
+            response_data.update({
+                "id_socio": socio.id_socio,
+                "cuit": socio.cuit,
+                "legajo": socio.legajo,
+                "telefono": socio.movil_socio or user.telefono or "",
+            })
+        except Exception as e:
+            # Si no hay cuenta socio, retornar solo datos del usuario
+            pass
+        
+        return Response(response_data, status=status.HTTP_200_OK)
 

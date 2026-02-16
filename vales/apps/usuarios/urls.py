@@ -1,7 +1,7 @@
 # D:\MUTUAL_VALES\vales\apps\usuarios\urls.py
 from django.urls import path
 from apps.usuarios.views.user_views import *
-from .views.api_views import RegistroSocioView
+from .views.api_views import RegistroSocioView, CurrentUserView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -29,4 +29,5 @@ urlpatterns = [
     path("registro-socio/", RegistroSocioView.as_view(), name="registro-socio"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("me/", CurrentUserView.as_view(), name="current-user"),
 ]
