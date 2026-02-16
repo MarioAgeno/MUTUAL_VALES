@@ -148,3 +148,59 @@ class CurrentUserView(APIView):
         
         return Response(response_data, status=status.HTTP_200_OK)
 
+
+class ChangePasswordView(APIView):
+    """
+    Endpoint para cambiar la contraseña del usuario autenticado.
+    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        
+        # Obtener datos de la solicitud
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        new_password_confirm = request.data.get('new_password_confirm')
+        
+        # Validaciones
+        if not old_password:
+            return Response(
+                {"detail": "La contraseña actual es requerida."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not new_password:
+            return Response(
+                {"detail": "La nueva contraseña es requerida."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if new_password != new_password_confirm:
+            return Response(
+                {"detail": "Las contraseñas no coinciden."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if len(new_password) < 6:
+            return Response(
+                {"detail": "La contraseña debe tener al menos 6 caracteres."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar contraseña actual
+        if not user.check_password(old_password):
+            return Response(
+                {"detail": "La contraseña actual es incorrecta."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        # Cambiar contraseña
+        user.set_password(new_password)
+        user.save()
+        
+        return Response({
+            "detail": "Contraseña cambiada correctamente."
+        }, status=status.HTTP_200_OK)
+
