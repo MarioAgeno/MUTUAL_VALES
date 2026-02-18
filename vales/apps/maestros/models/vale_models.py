@@ -35,6 +35,15 @@ class SolicitudVale(ModeloBaseGenerico):
 	observaciones = models.CharField("Observaciones", max_length=200, 
 									 null=True, blank=True)
 	
+	# Campos de seguridad de dispositivo
+	device_id = models.CharField("ID Dispositivo", max_length=255,
+								null=True, blank=True,
+								help_text="Identificador único del dispositivo desde donde se solicitó el vale")
+	device_model = models.CharField("Modelo Dispositivo", max_length=100,
+							   null=True, blank=True)
+	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
+								  null=True, blank=True)
+	
 	class Meta:
 		db_table = 'solicitud_vale'
 		verbose_name = ('Solicitud Vale')
@@ -58,11 +67,20 @@ class SolicitudVale(ModeloBaseGenerico):
 		if self.pk:
 			try:
 				orig = SolicitudVale.objects.get(pk=self.pk)
+				
+				if orig.estado_solicitud_vale != 1:
+					# No permitir modificaciones cuando el estado no es Pendiente
+					raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
+				
+				# 🔒 PRESERVAR device info del registro original al aprobar/rechazar
+				# Si los campos device están vacíos pero el original los tenía, preservarlos
+				if not self.device_id and orig.device_id:
+					self.device_id = orig.device_id
+					self.device_model = orig.device_model
+					self.device_platform = orig.device_platform
+					
 			except SolicitudVale.DoesNotExist:
 				orig = None
-			if orig and orig.estado_solicitud_vale != 1:
-				# No permitir modificaciones cuando el estado no es Pendiente
-				raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
 
 		# Lógica al cambiar estado
 		# 2 -> Aprobado: guardar fecha y activar estatus
@@ -107,6 +125,15 @@ class Compra(ModeloBaseGenerico):
 								default=0)
 	idempotency_key = models.CharField("Idempotency Key", 
 					max_length=36, null=True, blank=True, editable=False)
+	
+	# Campos de seguridad de dispositivo
+	device_id = models.CharField("ID Dispositivo", max_length=255,
+								null=True, blank=True,
+								help_text="Identificador único del dispositivo desde donde se realizó la compra")
+	device_model = models.CharField("Modelo Dispositivo", max_length=100,
+							   null=True, blank=True)
+	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
+								  null=True, blank=True)
 
 	class Meta:
 		db_table = 'compra'

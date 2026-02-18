@@ -1,18 +1,44 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.db import transaction
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..serializers import RegistroSocioSerializer
+from ..device_validator import validar_dispositivo_usuario
 from ...maestros.models.socio_models import Socio, SolicitudAdhesion 
 from  ...maestros.models.cuenta_socio_models import CuentaSocio
 
 User = get_user_model()
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Serializer personalizado que valida también el dispositivo en el login
+    """
+    def validate(self, attrs):
+        # Validación normal de credenciales
+        data = super().validate(attrs)
+        
+        # Validar dispositivo - MODO ESTRICTO
+        # Si el dispositivo no coincide, bloquea el acceso
+        validar_dispositivo_usuario(self.user, self.context['request'], strict=True)
+        
+        return data
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Vista de login personalizada que valida el dispositivo
+    """
+    serializer_class = CustomTokenObtainPairSerializer
 
 class RegistroSocioView(APIView):
     authentication_classes = []
@@ -83,6 +109,28 @@ class RegistroSocioView(APIView):
             is_active=True,
             id_sucursal_id=1,
         )
+        
+        # Agregar información del dispositivo si está disponible
+        device_id = data.get("device_id") or request.META.get("HTTP_X_DEVICE_ID")
+        device_model = data.get("device_model") or request.META.get("HTTP_X_DEVICE_MODEL")
+        device_platform = data.get("device_platform") or request.META.get("HTTP_X_DEVICE_PLATFORM")
+        
+        if device_id:
+            # Actualizar device info en User (Django)
+            user.device_id = device_id
+            user.device_model = device_model
+            user.device_platform = device_platform
+            user.device_registered_at = timezone.now()
+            user.device_last_used_at = timezone.now()
+            user.save()
+            
+            # ✅ CRÍTICO: También actualizar device info en Socio (para FastAPI)
+            socio.device_id = device_id
+            socio.device_model = device_model
+            socio.device_platform = device_platform
+            socio.device_registered_at = timezone.now()
+            socio.device_last_used_at = timezone.now()
+            socio.save()
 
         # 7) Grupo Usuario
         grupo, _ = Group.objects.get_or_create(name="Usuario")

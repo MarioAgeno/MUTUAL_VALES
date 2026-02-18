@@ -1,6 +1,7 @@
 # vales\apps\maestros\models\cliente_models.py
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 import re
 from datetime import date
 
@@ -60,6 +61,24 @@ class Socio(ModeloBaseGenerico):
 	black_list_usuario = models.CharField("Usuario Black List", 
 									 max_length=20, null=True, blank=True)
 	fecha_baja = models.DateField("Fecha de Baja", null=True, blank=True)
+	
+	# Campos de seguridad de dispositivo
+	device_id = models.CharField("ID Dispositivo", max_length=255, 
+								null=True, blank=True,
+								help_text="Identificador único del dispositivo del socio")
+	device_model = models.CharField("Modelo Dispositivo", max_length=100,
+								   null=True, blank=True,
+								   help_text="Modelo del dispositivo (ej: iPhone 12, Samsung Galaxy S21)")
+	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
+									  null=True, blank=True,
+									  help_text="Sistema operativo (iOS, Android)")
+	device_registered_at = models.DateTimeField("Fecha Registro Dispositivo",
+											   null=True, blank=True,
+											   help_text="Fecha y hora del primer registro del dispositivo")
+	device_last_used_at = models.DateTimeField("Último Uso Dispositivo",
+											  null=True, blank=True,
+											  help_text="Fecha y hora del último uso del dispositivo")
+	
 	class Meta:
 		db_table = 'socio'
 		verbose_name = ('Socio')
@@ -133,6 +152,15 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 	estado_solicitud_adhesion = models.IntegerField("Estado Solicitud Adhesión*", 
 									default=1,
 									choices=SOLICITUD_SOCIO)
+	
+	# Campos de seguridad de dispositivo
+	device_id = models.CharField("ID Dispositivo", max_length=255,
+								null=True, blank=True,
+								help_text="Identificador único del dispositivo desde donde se solicitó la adhesión")
+	device_model = models.CharField("Modelo Dispositivo", max_length=100,
+								   null=True, blank=True)
+	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
+									  null=True, blank=True)
 
 	class Meta:
 		db_table = 'solicitud_adhesion'
@@ -141,6 +169,18 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 		ordering = ['id_socio']
 
 	def save(self, *args, **kwargs):
+		# 🔒 PRESERVAR device info del registro original si se está editando
+		if self.pk:
+			try:
+				orig = SolicitudAdhesion.objects.get(pk=self.pk)
+				# Si los campos device están vacíos pero el original los tenía, preservarlos
+				if not self.device_id and orig.device_id:
+					self.device_id = orig.device_id
+					self.device_model = orig.device_model
+					self.device_platform = orig.device_platform
+			except SolicitudAdhesion.DoesNotExist:
+				pass
+		
 		# Verificar si el estado cambió a Aprobada (2)
 		if self.estado_solicitud_adhesion == 2:
 			self.estatus_solicitud_adhesion = True
@@ -150,5 +190,16 @@ class SolicitudAdhesion(ModeloBaseGenerico):
 				socio.movil_socio = self.movil_solicitud_adhesion
 			if self.email_solicitud_adhesion:
 				socio.email_socio = self.email_solicitud_adhesion
+			
+			# ✅ CRÍTICO: Copiar información del dispositivo de la solicitud al socio
+			if self.device_id:
+				socio.device_id = self.device_id
+				socio.device_model = self.device_model
+				socio.device_platform = self.device_platform
+				# Solo actualizar device_registered_at si el socio no tiene device_id previo
+				if not socio.device_registered_at:
+					socio.device_registered_at = timezone.now()
+				socio.device_last_used_at = timezone.now()
+			
 			socio.save()
 		super().save(*args, **kwargs)
