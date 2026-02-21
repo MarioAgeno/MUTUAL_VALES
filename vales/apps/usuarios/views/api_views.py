@@ -170,6 +170,9 @@ class CurrentUserView(APIView):
     def get(self, request):
         user = request.user
         
+        # Obtener el primer grupo del usuario (Usuario o Comercio)
+        user_group = user.groups.first().name if user.groups.exists() else None
+        
         # Response base con datos del usuario
         response_data = {
             "id": user.id,
@@ -178,21 +181,38 @@ class CurrentUserView(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "telefono": user.telefono or "",
+            "user_type": user_group,  # "Usuario" o "Comercio"
         }
         
-        # Intentar obtener la cuenta socio asociada
-        try:
-            cuenta_socio = user.cuenta_socio
-            socio = cuenta_socio.socio
-            response_data.update({
-                "id_socio": socio.id_socio,
-                "cuit": socio.cuit,
-                "legajo": socio.legajo,
-                "telefono": socio.movil_socio or user.telefono or "",
-            })
-        except Exception as e:
-            # Si no hay cuenta socio, retornar solo datos del usuario
-            pass
+        # Si es un Usuario (Socio), intentar obtener datos del socio
+        if user_group == "Usuario":
+            try:
+                cuenta_socio = user.cuenta_socio
+                socio = cuenta_socio.socio
+                response_data.update({
+                    "id_socio": socio.id_socio,
+                    "cuit": socio.cuit,
+                    "legajo": socio.legajo,
+                    "telefono": socio.movil_socio or user.telefono or "",
+                })
+            except Exception as e:
+                # Si no hay cuenta socio, retornar solo datos del usuario
+                pass
+        
+        # Si es un Comercio, intentar obtener datos del comercio
+        elif user_group == "Comercio":
+            try:
+                # Buscar comercio vinculado a través de cuenta_comercio
+                cuenta_comercio = user.cuenta_comercio
+                comercio = cuenta_comercio.comercio
+                response_data.update({
+                    "id_comercio": comercio.id_comercio,
+                    "nombre_comercio": comercio.nombre_comercio,
+                    "cuit_comercio": comercio.cuit,
+                })
+            except Exception as e:
+                # Si no hay cuenta comercio, retornar solo datos del usuario
+                pass
         
         return Response(response_data, status=status.HTTP_200_OK)
 
