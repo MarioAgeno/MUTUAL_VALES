@@ -6,6 +6,7 @@ from .views.api_views import (
     CurrentUserView, 
     ChangePasswordView,
     CustomTokenObtainPairView,
+	DeviceRelinkRequestView,
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -33,4 +34,5 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("me/", CurrentUserView.as_view(), name="current-user"),
     path("cambiar-contraseña/", ChangePasswordView.as_view(), name="change-password"),
+	path("revincular-dispositivo/", DeviceRelinkRequestView.as_view(), name="revincular-dispositivo"),
 ]

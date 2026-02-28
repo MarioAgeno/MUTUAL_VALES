@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from ..serializers import RegistroSocioSerializer
+from ..serializers import DeviceRelinkRequestSerializer
 from ..device_validator import validar_dispositivo_usuario
 from ...maestros.models.socio_models import Socio, SolicitudAdhesion 
 from  ...maestros.models.cuenta_socio_models import CuentaSocio
@@ -30,6 +31,29 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Validar dispositivo - MODO ESTRICTO
         # Si el dispositivo no coincide, bloquea el acceso
         validar_dispositivo_usuario(self.user, self.context['request'], strict=True)
+
+        # Sincronizar dispositivo de User -> Socio para FastAPI
+        # (solicitar vale/compras validan contra Socio.device_id)
+        try:
+            cuenta_socio = CuentaSocio.objects.select_related("socio").get(user=self.user, activo=True)
+            socio = cuenta_socio.socio
+
+            if socio.device_id != self.user.device_id:
+                socio.device_id = self.user.device_id
+                socio.device_model = self.user.device_model
+                socio.device_platform = self.user.device_platform
+                if not socio.device_registered_at and self.user.device_registered_at:
+                    socio.device_registered_at = self.user.device_registered_at
+                socio.device_last_used_at = timezone.now()
+                socio.save(update_fields=[
+                    'device_id',
+                    'device_model',
+                    'device_platform',
+                    'device_registered_at',
+                    'device_last_used_at',
+                ])
+        except CuentaSocio.DoesNotExist:
+            pass
         
         return data
 
@@ -271,4 +295,26 @@ class ChangePasswordView(APIView):
         return Response({
             "detail": "Contraseña cambiada correctamente."
         }, status=status.HTTP_200_OK)
+
+
+class DeviceRelinkRequestView(APIView):
+    """
+    Crea una solicitud de re-vinculación de dispositivo.
+    Importante: NO actualiza device_id automáticamente.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        serializer = DeviceRelinkRequestSerializer(
+            data=request.data,
+            context={'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(
+            {"detail": "Solicitud de re-vinculación enviada correctamente. Pendiente de validación."},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
