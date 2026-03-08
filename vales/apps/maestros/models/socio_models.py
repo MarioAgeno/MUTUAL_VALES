@@ -8,7 +8,7 @@ from datetime import date
 from utils.validator.validaciones import validar_cuit
 from .base_gen_models import ModeloBaseGenerico
 from .base_models import (Localidad, Provincia, TipoIva, 
-						  TipoDocumentoIdentidad)
+					TipoDocumentoIdentidad)
 from .sucursal_models import Sucursal
 from entorno.constantes_base import (SOLICITUD_SOCIO,
 	ESTATUS_GEN, SEXO, TIPO_PERSONA, SI_NO)
@@ -16,68 +16,66 @@ from entorno.constantes_base import (SOLICITUD_SOCIO,
 class Socio(ModeloBaseGenerico):
 	id_socio = models.AutoField(primary_key=True)
 	estatus_socio = models.BooleanField("Estatus*", default=False, 
-									choices=ESTATUS_GEN)
+								choices=ESTATUS_GEN)
 	codigo_socio = models.IntegerField("Código", null=True, blank=True)
 	nombre_socio = models.CharField("Nombre Socio*", max_length=50)
 	domicilio_socio = models.CharField("Domicilio Socio*", max_length=50)
 	codigo_postal = models.CharField("Código Postal*", max_length=5,
-                                    null=True, blank=True)
+                                null=True, blank=True)
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
-									verbose_name="Provincia*",
-          							null=True, blank=True)
+								verbose_name="Provincia*",
+          						null=True, blank=True)
 	id_localidad = models.ForeignKey(Localidad, on_delete=models.PROTECT,
-									verbose_name="Localidad*",
-         							null=True, blank=True)
+								verbose_name="Localidad*",
+         						null=True, blank=True)
 	tipo_persona = models.CharField("Tipo de Persona*", max_length=1,
-									default="F", 
-									choices=TIPO_PERSONA)
+								default="F", 
+								choices=TIPO_PERSONA)
 	id_tipo_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT,
-									verbose_name="Tipo de IVA*")
+								verbose_name="Tipo de IVA*")
 	id_tipo_documento_identidad = models.ForeignKey(TipoDocumentoIdentidad, 
-									on_delete=models.PROTECT, 
-									verbose_name="Tipo Doc. Identidad*")
+								on_delete=models.PROTECT, 
+								verbose_name="Tipo Doc. Identidad*")
 	numero_documento = models.IntegerField("Número doc.*", null=True, blank=True)
 	cuit = models.BigIntegerField("CUIT/CUIL*", unique=True, null=True, blank=True)
 	legajo = models.BigIntegerField("Legajo*", unique=True, null=True, blank=True)
 	telefono_socio = models.CharField("Teléfono*", max_length=15)
 	telefono2_socio = models.CharField("Teléfono Alternativo", max_length=15,
-									null=True, blank=True)
+								null=True, blank=True)
 	movil_socio = models.CharField("Móvil", max_length=15, null=True, blank=True)
 	email_socio = models.EmailField("Email*", max_length=50)
 	fecha_nacimiento = models.DateField("Fecha Nacimiento", 
-									null=True, blank=True)
+								null=True, blank=True)
 	fecha_alta = models.DateField("Fecha Alta", default=date.today,
-                               		null=True, blank=True)
+                               	null=True, blank=True)
 	sexo = models.CharField("Sexo*", max_length=1, 
-									default="M", choices=SEXO)
+								default="M", choices=SEXO)
 	id_sucursal = models.ForeignKey(Sucursal, 
-									on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Sucursal*")
+								on_delete=models.CASCADE,
+								null=True, blank=True,
+								verbose_name="Sucursal*")
 	black_list = models.BooleanField("Black List", default=False, 
-									 choices=SI_NO)
+								choices=SI_NO)
 	black_list_motivo = models.CharField("Motivo Black List", max_length=50, 
-									  null=True, blank=True)
+								null=True, blank=True)
 	black_list_usuario = models.CharField("Usuario Black List", 
-									 max_length=20, null=True, blank=True)
+								max_length=20, null=True, blank=True)
 	fecha_baja = models.DateField("Fecha de Baja", null=True, blank=True)
-	
-	# Campos de seguridad de dispositivo
 	device_id = models.CharField("ID Dispositivo", max_length=255, 
 								null=True, blank=True,
 								help_text="Identificador único del dispositivo del socio")
 	device_model = models.CharField("Modelo Dispositivo", max_length=100,
-								   null=True, blank=True,
-								   help_text="Modelo del dispositivo (ej: iPhone 12, Samsung Galaxy S21)")
+								null=True, blank=True,
+								help_text="Modelo del dispositivo (ej: iPhone 12, Samsung Galaxy S21)")
 	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
-									  null=True, blank=True,
-									  help_text="Sistema operativo (iOS, Android)")
+								null=True, blank=True,
+								help_text="Sistema operativo (iOS, Android)")
 	device_registered_at = models.DateTimeField("Fecha Registro Dispositivo",
-											   null=True, blank=True,
-											   help_text="Fecha y hora del primer registro del dispositivo")
+								null=True, blank=True,
+								help_text="Fecha y hora del primer registro del dispositivo")
 	device_last_used_at = models.DateTimeField("Último Uso Dispositivo",
-											  null=True, blank=True,
-											  help_text="Fecha y hora del último uso del dispositivo")
+								null=True, blank=True,
+								help_text="Fecha y hora del último uso del dispositivo")
 	
 	class Meta:
 		db_table = 'socio'
@@ -130,37 +128,33 @@ class Socio(ModeloBaseGenerico):
 	@property
 	def nombre_tipo_documento_identidad(self):
 		return self.id_tipo_documento_identidad.nombre_documento_identidad
-	
+
 
 class SolicitudAdhesion(ModeloBaseGenerico):
 	id_solicitud_adhesion = models.AutoField(primary_key=True)
-	estatus_solicitud_adhesion = models.BooleanField(
-									"Estatus*", default=True, 
-									choices=ESTATUS_GEN)
+	estatus_solicitud_adhesion = models.BooleanField("Estatus*", default=True, 
+								choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
-									verbose_name="Socio*")
+								verbose_name="Socio*")
 	nombre_solicitud_adhesion = models.CharField("Nombre Socio*", max_length=50,
-									null=True, blank=True)
+								null=True, blank=True)
 	cuit_solicitud_adhesion = models.BigIntegerField("CUIT/CUIL*", 
-									null=True, blank=True)
+								null=True, blank=True)
 	legajo_solicitud_adhesion = models.BigIntegerField("Legajo*", 
-									null=True, blank=True)
+								null=True, blank=True)
 	movil_solicitud_adhesion = models.CharField("Móvil*", max_length=15, 
-									null=True, blank=True)
+								null=True, blank=True)
 	email_solicitud_adhesion = models.EmailField("Email*", max_length=50,
-									null=True, blank=True)
+								null=True, blank=True)
 	estado_solicitud_adhesion = models.IntegerField("Estado Solicitud Adhesión*", 
-									default=1,
-									choices=SOLICITUD_SOCIO)
-	
-	# Campos de seguridad de dispositivo
+								default=1, choices=SOLICITUD_SOCIO)
 	device_id = models.CharField("ID Dispositivo", max_length=255,
 								null=True, blank=True,
 								help_text="Identificador único del dispositivo desde donde se solicitó la adhesión")
 	device_model = models.CharField("Modelo Dispositivo", max_length=100,
-								   null=True, blank=True)
+								null=True, blank=True)
 	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
-									  null=True, blank=True)
+								null=True, blank=True)
 
 	class Meta:
 		db_table = 'solicitud_adhesion'

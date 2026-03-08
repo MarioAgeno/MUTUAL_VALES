@@ -71,6 +71,7 @@ class DataViewList():
 		'cuit_solicitud_adhesion': (1, 'CUIT/CUIL'),
 		'legajo_solicitud_adhesion': (1, 'Legajo'),
 		'movil_solicitud_adhesion': (1, 'Teléfono Móvil'),
+		'device_model': (1, 'Dispositivo'),
 		'estado_solicitud_adhesion': (1, 'Estado Solicitud'),
 		'acciones': (1, 'Acciones'),
 	}
@@ -82,10 +83,11 @@ class DataViewList():
 		{'field_name': 'cuit_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'legajo_solicitud_adhesion', 'date_format': None},
 		{'field_name': 'movil_solicitud_adhesion', 'date_format': None},
+		{'field_name': 'device_model', 'date_format': None},
 		{'field_name': 'estado_solicitud_adhesion', 'date_format': None},
 	]
 
-
+ 
 # SolicitudAdhesionListView - Inicio
 class SolicitudAdhesionListView(MaestroListView):
 	model = ConfigViews.model
@@ -190,9 +192,23 @@ class SolicitudAdhesionDeleteView (MaestroDeleteView):
 	list_view_name = ConfigViews.list_view_name
 	template_name = ConfigViews.template_delete
 	success_url = ConfigViews.success_url
+	ESTADO_APROBADA = 2
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_delete
+
+	def post(self, request, *args, **kwargs):
+		solicitud = self.get_object()
+		
+		# Solo se permite borrar solicitudes pendientes o rechazadas.
+		if solicitud.estado_solicitud_adhesion == self.ESTADO_APROBADA:
+			messages.error(
+				request,
+				'No se puede eliminar una solicitud aceptada. Solo se permiten solicitudes pendientes o rechazadas.'
+			)
+			return redirect(self.success_url)
+		
+		return super().post(request, *args, **kwargs)
 	
 	# extra_context = {
 	# 	"accion": f"Eliminar {ConfigViews.model._meta.verbose_name}",

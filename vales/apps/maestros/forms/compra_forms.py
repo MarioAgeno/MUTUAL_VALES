@@ -8,9 +8,21 @@ from diseno_base.diseno_bootstrap import (
 
 
 class CompraForm(CrudGenericForm):
+	idempotency_key = forms.CharField(
+		label='Idempotency Key',
+		required=False,
+		widget=forms.TextInput(attrs={**formclasstext, 'readonly': True})
+	)
+
 	def __init__(self, *args, **kwargs):
 		# Filtrar los valores de los campos id_solicitud_vale
 		super().__init__(*args, **kwargs)
+		
+		# El modelo lo define editable=False; se expone solo para lectura en formulario.
+		if self.instance and self.instance.pk:
+			self.fields['idempotency_key'].initial = self.instance.idempotency_key
+		self.fields['idempotency_key'].disabled = True
+		
 		if 'id_solicitud_vale' in self.fields:
 			self.fields['id_solicitud_vale'].queryset = Compra._meta.get_field('id_solicitud_vale').related_model.objects.filter(estado_solicitud_vale=2)
 		# Mostrar sólo socios y comercios activos en los selects
@@ -51,22 +63,28 @@ class CompraForm(CrudGenericForm):
 			'estatus_compra':
 				forms.Select(attrs={**formclassselect}),
 			'id_solicitud_vale':
-				forms.Select(attrs={**formclassselect}),
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 			'id_socio':
 				forms.Select(attrs={**formclassselect}),
 			'id_comercio':
 				forms.Select(attrs={**formclassselect}),
 			'id_plan':
 				forms.Select(attrs={**formclassselect}),
-			'monto_compra':
-				forms.NumberInput(attrs={**formclasstext}),
 			'estado_compra':
 				forms.Select(attrs={**formclassselect}),
 			'monto_compra':
-				forms.NumberInput(attrs={**formclasstext}),
+				forms.NumberInput(attrs={**formclasstext, 'readonly': True}),
 			'fecha_compra':
 				forms.TextInput(attrs={'type':'date', **formclassdate, 'readonly': True}),
 			'autorizacion_compra':
-				forms.NumberInput(attrs={**formclasstext}),
+				forms.NumberInput(attrs={**formclasstext, 'readonly': True}),
+			'idempotency_key':
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+			'device_id':
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+			'device_model':
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
+			'device_platform':
+				forms.TextInput(attrs={**formclasstext, 'readonly': True}),
 		}
     

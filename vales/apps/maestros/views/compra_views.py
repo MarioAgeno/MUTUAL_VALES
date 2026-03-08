@@ -68,21 +68,25 @@ class DataViewList():
 	
 	table_headers = {
 		'estatus_compra': (1, 'Estatus'),
-		'id_compra': (1, 'ID Compra'),
+		'fecha_compra': (1, 'Fecha Compra'),
 		'id_socio': (2, 'Nombre Socio'),
 		'id_comercio': (2, 'Comercio'),
-		'monto_compra': (2, 'Monto Compra'),
-		'estado_compra': (2, 'Estado Compra'),
+		'monto_compra': (1, 'Monto Compra'),
+		'id_plan': (1, 'Plan'),
+		'estado_compra': (1, 'Estado Compra'),
+		'device_model': (1, 'Modelo Dispositivo'),
 		'acciones': (1, 'Acciones'),
 	}
 
 	table_data = [
 		{'field_name': 'estatus_compra', 'date_format': None},
-		{'field_name': 'id_compra', 'date_format': None},
+		{'field_name': 'fecha_compra', 'date_format': None},
 		{'field_name': 'id_socio', 'date_format': None},
 		{'field_name': 'id_comercio', 'date_format': None},
 		{'field_name': 'monto_compra', 'date_format': None},
+		{'field_name': 'id_plan', 'date_format': None},
 		{'field_name': 'estado_compra', 'date_format': None},
+		{'field_name': 'device_model', 'date_format': None},
 	]
 
 
@@ -177,6 +181,27 @@ class CompraUpdateView(MaestroUpdateView):
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_change
+
+	def get_form(self, form_class=None):
+		form = super().get_form(form_class)
+		
+		# Las compras provienen del API, se muestran en modo solo lectura.
+		for field in form.fields.values():
+			field.disabled = True
+		
+		return form
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['solo_lectura'] = True
+		return context
+
+	def post(self, request, *args, **kwargs):
+		messages.error(
+			request,
+			'Las compras se sincronizan desde la API y no pueden modificarse manualmente.'
+		)
+		return redirect(self.success_url)
 	
 	# extra_context = {
 	# 	"accion": f"Editar {ConfigViews.model._meta.verbose_name}",
@@ -193,6 +218,13 @@ class CompraDeleteView (MaestroDeleteView):
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_delete
+
+	def post(self, request, *args, **kwargs):
+		messages.error(
+			request,
+			'Las compras se sincronizan desde la API y no pueden eliminarse manualmente.'
+		)
+		return redirect(self.success_url)
 	
 	# extra_context = {
 	# 	"accion": f"Eliminar {ConfigViews.model._meta.verbose_name}",

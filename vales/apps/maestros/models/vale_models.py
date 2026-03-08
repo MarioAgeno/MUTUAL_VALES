@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from datetime import date
+from decimal import Decimal
 
 
 
@@ -14,35 +15,33 @@ from entorno.constantes_base import (SOLICITUD_VALE, ESTATUS_GEN)
 class SolicitudVale(ModeloBaseGenerico):
 	id_solicitud_vale = models.AutoField(primary_key=True)
 	estatus_solicitud_vale = models.BooleanField("Estatus*", default=False, 
-									choices=ESTATUS_GEN)
+								choices=ESTATUS_GEN)
 	id_socio = models.ForeignKey(Socio, on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Socio*")
+								null=True, blank=True,
+								verbose_name="Socio*")
 	id_comercio = models.ForeignKey(Comercio, on_delete=models.CASCADE,
-									null=True, blank=True,
-									verbose_name="Comercio*")
+								null=True, blank=True,
+								verbose_name="Comercio*")
 	monto_solicitud_vale = models.DecimalField("Monto Solicitud Vale", 
-									max_digits=15, decimal_places=2,
-									default=0.00)
+								max_digits=15, decimal_places=2,
+								default=0.00)
 	estado_solicitud_vale = models.IntegerField("Estado Solicitud Vale*", 
-									default=1, choices=SOLICITUD_VALE)
+								default=1, choices=SOLICITUD_VALE)
 	limite_aprobado = models.DecimalField("Límite Aprobado", max_digits=15, 
-									decimal_places=2, default=0.00)
+								decimal_places=2, default=0.00)
 	consumido_solicitud_vale = models.DecimalField("Total Consumido", max_digits=15, 
-									decimal_places=2, default=0.00)
+								decimal_places=2, default=0.00)
 	fecha_aprobacion = models.DateField("Fecha Aprobación", 
-									null=True, blank=True)
+								null=True, blank=True)
 	observaciones = models.CharField("Observaciones", max_length=200, 
-									 null=True, blank=True)
-	
-	# Campos de seguridad de dispositivo
+								null=True, blank=True)
 	device_id = models.CharField("ID Dispositivo", max_length=255,
 								null=True, blank=True,
 								help_text="Identificador único del dispositivo desde donde se solicitó el vale")
 	device_model = models.CharField("Modelo Dispositivo", max_length=100,
-							   null=True, blank=True)
+								null=True, blank=True)
 	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
-								  null=True, blank=True)
+								null=True, blank=True)
 	
 	class Meta:
 		db_table = 'solicitud_vale'
@@ -59,10 +58,39 @@ class SolicitudVale(ModeloBaseGenerico):
 		# Validar que el comercio esté activo
 		if self.id_comercio and not getattr(self.id_comercio, 'estatus_comercio', False):
 			errors['id_comercio'] = 'El comercio seleccionado no está activo.'
+
+		monto_solicitado = self.monto_solicitud_vale if self.monto_solicitud_vale is not None else Decimal('0.00')
+		monto_aprobado = self.limite_aprobado if self.limite_aprobado is not None else Decimal('0.00')
+
+		# Si se ingresa un importe aprobado (>0), forzar estado Aprobado.
+		if monto_aprobado > Decimal('0.00'):
+			self.estado_solicitud_vale = 2
+
+		# Si se marca Aprobado sin importe, usar el monto solicitado automáticamente.
+		if self.estado_solicitud_vale == 2 and monto_aprobado <= Decimal('0.00'):
+			self.limite_aprobado = monto_solicitado
+			monto_aprobado = self.limite_aprobado
+
+		# Nunca permitir aprobar por encima de lo solicitado.
+		if monto_aprobado > monto_solicitado:
+			errors['limite_aprobado'] = 'El importe aprobado no puede ser mayor al solicitado.'
+
 		if errors:
 			raise ValidationError(errors)
 
 	def save(self, *args, **kwargs):
+		# Aplicar reglas automáticas también fuera de formularios (API/scripts).
+		monto_solicitado = self.monto_solicitud_vale if self.monto_solicitud_vale is not None else Decimal('0.00')
+		monto_aprobado = self.limite_aprobado if self.limite_aprobado is not None else Decimal('0.00')
+
+		if monto_aprobado > Decimal('0.00'):
+			self.estado_solicitud_vale = 2
+		elif self.estado_solicitud_vale == 2 and monto_aprobado <= Decimal('0.00'):
+			self.limite_aprobado = monto_solicitado
+
+		if self.limite_aprobado > monto_solicitado:
+			raise ValidationError('El importe aprobado no puede ser mayor al solicitado.')
+
 		# Evitar modificaciones si el registro ya no está en estado Pendiente
 		if self.pk:
 			try:
@@ -124,16 +152,15 @@ class Compra(ModeloBaseGenerico):
 	autorizacion_compra = models.IntegerField("Autorización Compra*", 
 								default=0)
 	idempotency_key = models.CharField("Idempotency Key", 
-					max_length=36, null=True, blank=True, editable=False)
-	
-	# Campos de seguridad de dispositivo
+								max_length=36, null=True, 
+								blank=True, editable=False)
 	device_id = models.CharField("ID Dispositivo", max_length=255,
 								null=True, blank=True,
 								help_text="Identificador único del dispositivo desde donde se realizó la compra")
 	device_model = models.CharField("Modelo Dispositivo", max_length=100,
-							   null=True, blank=True)
+								null=True, blank=True)
 	device_platform = models.CharField("Plataforma Dispositivo", max_length=20,
-								  null=True, blank=True)
+								null=True, blank=True)
 
 	class Meta:
 		db_table = 'compra'

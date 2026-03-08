@@ -8,7 +8,7 @@ from diseno_base.diseno_bootstrap import (
 
 
 class ComercioForm(CrudGenericForm):
-	
+
 	class Meta:
 		model = Comercio
 		fields = '__all__'
@@ -42,10 +42,10 @@ class ComercioForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'bonificacion_comercio':
 				forms.NumberInput(attrs={**formclasstext,
-						   'min': 0, 'max': 99.99}),
+						'min': 0, 'max': 99.99}),
 			'gasto_adm_comercio':
 				forms.NumberInput(attrs={**formclasstext,
-						   'min': 0, 'max': 99.99}),
+						'min': 0, 'max': 99.99}),
 			'observacion_comercio': 
 				forms.Textarea(attrs={**formclasstext, 'rows': '3'}),
 		}

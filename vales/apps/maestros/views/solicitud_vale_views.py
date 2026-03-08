@@ -60,7 +60,7 @@ class DataViewList():
 	search_fields = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio', 'estado_solicitud_vale']
 
 	# Ordenar por el nombre del comercio y por la descripción del plan
-	ordering = ['id_socio__nombre_socio', 'id_comercio__nombre_comercio']
+	ordering = ['fcontrol','id_socio__nombre_socio', 'id_comercio__nombre_comercio']
 
 	paginate_by = 8
 	
@@ -69,7 +69,8 @@ class DataViewList():
 		'id_solicitud_vale': (1, 'ID Solicitud'),
 		'id_socio': (2, 'Nombre Socio'),
 		'id_comercio': (2, 'Comercio'),
-		'monto_solicitud_vale': (2, 'Monto Solicitud'),
+		'limite_aprobado': (1, 'Monto Aprobado'),
+		'consumido_solicitud_vale': (1, 'Monto Consumido'),
 		'estado_solicitud_vale': (2, 'Estado Solicitud'),
 		'acciones': (1, 'Acciones'),
 	}
@@ -79,7 +80,8 @@ class DataViewList():
 		{'field_name': 'id_solicitud_vale', 'date_format': None},
 		{'field_name': 'id_socio', 'date_format': None},
 		{'field_name': 'id_comercio', 'date_format': None},
-		{'field_name': 'monto_solicitud_vale', 'date_format': None},
+		{'field_name': 'limite_aprobado', 'date_format': None},
+		{'field_name': 'consumido_solicitud_vale', 'date_format': None},
 		{'field_name': 'estado_solicitud_vale', 'date_format': None},
 	]
 
@@ -188,9 +190,22 @@ class SolicitudValeDeleteView (MaestroDeleteView):
 	list_view_name = ConfigViews.list_view_name
 	template_name = ConfigViews.template_delete
 	success_url = ConfigViews.success_url
+	ESTADOS_NO_ELIMINABLES = {2, 4}  # 2=Aprobado, 4=Consumido
 	
 	#-- Indicar el permiso que requiere para ejecutar la acción.
 	permission_required = ConfigViews.permission_delete
+
+	def post(self, request, *args, **kwargs):
+		solicitud = self.get_object()
+		
+		if solicitud.estado_solicitud_vale in self.ESTADOS_NO_ELIMINABLES:
+			messages.error(
+				request,
+				'No se puede eliminar una solicitud de vale en estado Aprobado o Consumido.'
+			)
+			return redirect(self.success_url)
+		
+		return super().post(request, *args, **kwargs)
 	
 	# extra_context = {
 	# 	"accion": f"Eliminar {ConfigViews.model._meta.verbose_name}",

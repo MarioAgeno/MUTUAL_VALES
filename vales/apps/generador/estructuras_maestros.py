@@ -331,4 +331,30 @@ estructura_campos = {
 			],
 		}
 	},
+
+	'compra': {
+		'Compras Realizadas': {
+			'fila_1': [
+				{'field_name': 'estatus_vale', 'columna': 2, 'design': None},
+				{'field_name': 'id_solicitud_vale', 'columna': 2, 'design': None},
+			],
+			'fila_2': [
+				{'field_name': 'id_socio', 'columna': 3, 'design': None},
+				{'field_name': 'id_comercio', 'columna': 3, 'design': None},
+			],
+			'fila_3': [
+				{'field_name': 'id_plan', 'columna': 3, 'design': None},
+				{'field_name': 'monto_compra', 'columna': 3, 'design': None},
+				{'field_name': 'estado_compra', 'columna': 2, 'design': None},
+				{'field_name': 'fecha_compra', 'columna': 2, 'design': None},
+			],
+			'fila_4': [
+				{'field_name': 'autorizacion_compra', 'columna': 2, 'design': None},
+				{'field_name': 'idempotency_key', 'columna': 2, 'design': None},
+				{'field_name': 'device_id', 'columna': 2, 'design': None},
+				{'field_name': 'device_model', 'columna': 2, 'design': None},
+				{'field_name': 'device_platform', 'columna': 2, 'design': None},
+			],
+		}
+	},
 }
