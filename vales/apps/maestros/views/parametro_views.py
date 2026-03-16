@@ -63,13 +63,18 @@ class DataViewList():
 	paginate_by = 8
 	
 	table_headers = {
-		'id_empresa': (4, 'Empresa'),
-		
+		'estatus_parametro': (1, 'Estatus'),
+		'id_empresa': (7, 'Empresa'),
+		'fecha_vencimiento': (2, 'Fecha Vencimiento'),
+		'interes': (1, 'Interés'),
 		'acciones': (2, 'Acciones'),
 	}
 	
 	table_data = [
+		{'field_name': 'estatus_parametro', 'date_format': None},
 		{'field_name': 'id_empresa', 'date_format': None},
+		{'field_name': 'fecha_vencimiento', 'date_format': None},
+		{'field_name': 'interes', 'date_format': None},
 	]
 
 

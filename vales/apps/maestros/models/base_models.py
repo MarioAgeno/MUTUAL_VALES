@@ -136,17 +136,17 @@ class TipoIva(ModeloBaseGenerico):
 class Empresa(ModeloBaseGenerico):
 	id_empresa = models.AutoField(primary_key=True)
 	estatus_empresa = models.BooleanField("Estatus*", default=True,
-										  choices=ESTATUS_GEN)
+								choices=ESTATUS_GEN)
 	nombre_fiscal = models.CharField("Nombre Fiscal*", max_length=50)
 	nombre_comercial = models.CharField("Nombre Comercial*", max_length=50)
 	domicilio_empresa = models.CharField("Domicilio*", max_length=50)
 	codigo_postal = models.CharField("Código postal*", max_length=4)
 	id_localidad = models.ForeignKey(Localidad, on_delete=models.PROTECT, 
-								  verbose_name="Localidad*")
+								verbose_name="Localidad*")
 	id_provincia = models.ForeignKey(Provincia, on_delete=models.PROTECT, 
-								  verbose_name="Provincia*")
+								verbose_name="Provincia*")
 	id_iva = models.ForeignKey(TipoIva, on_delete=models.PROTECT, 
-						 verbose_name="Tipo I.V.A.", null=True, blank=True)
+								verbose_name="Tipo I.V.A.", null=True, blank=True)
 	cuit = models.BigIntegerField("C.U.I.T.*", )
 	ingresos_bruto = models.CharField("Ing. Bruto*", max_length=15)
 	inicio_actividad = models.DateField("Inicio de actividad*")
@@ -156,8 +156,9 @@ class Empresa(ModeloBaseGenerico):
 	telefono = models.CharField("Teléfono*", max_length=20)
 	email_empresa = models.EmailField("Correo*", max_length=50)
 	web_empresa = models.CharField("Web", max_length=50, 
-								   null=True, blank=True)
-	logo_empresa = models.BinaryField()  # Para el campo 'image'
+								null=True, blank=True)
+	logo_empresa = models.BinaryField("Logo", 
+								null=True, blank=True)  # Para el campo 'image'
 
 	class Meta:
 		db_table = 'empresa'

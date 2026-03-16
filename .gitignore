@@ -1,5 +1,8 @@
 .venv
 venv/
+datavfox/
+datavfox_old/
+*.bak
 __pycache__
 .env
 *.zip

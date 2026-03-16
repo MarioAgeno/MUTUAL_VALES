@@ -18,7 +18,7 @@ class ParametroForm(CrudGenericForm):
 				forms.Select(attrs={**formclassselect}),
 			'interes':
 				forms.NumberInput(attrs={**formclasstext,
-						   'min': 0, 'max': 99.99}),
+						'min': 0, 'max': 99.99}),
 			'fecha_vencimiento': 
 				forms.TextInput(attrs={'type':'date', **formclassdate}),
 
