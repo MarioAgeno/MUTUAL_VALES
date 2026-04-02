@@ -62,10 +62,6 @@ class SolicitudVale(ModeloBaseGenerico):
 		monto_solicitado = self.monto_solicitud_vale if self.monto_solicitud_vale is not None else Decimal('0.00')
 		monto_aprobado = self.limite_aprobado if self.limite_aprobado is not None else Decimal('0.00')
 
-		# Si se ingresa un importe aprobado (>0), forzar estado Aprobado.
-		if monto_aprobado > Decimal('0.00'):
-			self.estado_solicitud_vale = 2
-
 		# Si se marca Aprobado sin importe, usar el monto solicitado automáticamente.
 		if self.estado_solicitud_vale == 2 and monto_aprobado <= Decimal('0.00'):
 			self.limite_aprobado = monto_solicitado
@@ -82,8 +78,19 @@ class SolicitudVale(ModeloBaseGenerico):
 		# Aplicar reglas automáticas también fuera de formularios (API/scripts).
 		monto_solicitado = self.monto_solicitud_vale if self.monto_solicitud_vale is not None else Decimal('0.00')
 		monto_aprobado = self.limite_aprobado if self.limite_aprobado is not None else Decimal('0.00')
+		orig = None
+		limite_aprobado_modificado = True
 
-		if monto_aprobado > Decimal('0.00'):
+		if self.pk:
+			try:
+				orig = SolicitudVale.objects.get(pk=self.pk)
+				limite_aprobado_modificado = orig.limite_aprobado != self.limite_aprobado
+			except SolicitudVale.DoesNotExist:
+				orig = None
+				limite_aprobado_modificado = True
+
+		# Solo auto-aprobar cuando el importe aprobado se modifico en este guardado.
+		if self.estado_solicitud_vale == 1 and monto_aprobado > Decimal('0.00') and limite_aprobado_modificado:
 			self.estado_solicitud_vale = 2
 		elif self.estado_solicitud_vale == 2 and monto_aprobado <= Decimal('0.00'):
 			self.limite_aprobado = monto_solicitado
@@ -93,22 +100,16 @@ class SolicitudVale(ModeloBaseGenerico):
 
 		# Evitar modificaciones si el registro ya no está en estado Pendiente
 		if self.pk:
-			try:
-				orig = SolicitudVale.objects.get(pk=self.pk)
-				
-				if orig.estado_solicitud_vale != 1:
-					# No permitir modificaciones cuando el estado no es Pendiente
-					raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
-				
-				# 🔒 PRESERVAR device info del registro original al aprobar/rechazar
-				# Si los campos device están vacíos pero el original los tenía, preservarlos
-				if not self.device_id and orig.device_id:
-					self.device_id = orig.device_id
-					self.device_model = orig.device_model
-					self.device_platform = orig.device_platform
-					
-			except SolicitudVale.DoesNotExist:
-				orig = None
+			if orig and orig.estado_solicitud_vale != 1:
+				# No permitir modificaciones cuando el estado no es Pendiente
+				raise ValidationError('No se puede modificar este registro porque ya fue cambiado su estado de Pendiente.')
+
+			# 🔒 PRESERVAR device info del registro original al aprobar/rechazar
+			# Si los campos device están vacíos pero el original los tenía, preservarlos
+			if orig and not self.device_id and orig.device_id:
+				self.device_id = orig.device_id
+				self.device_model = orig.device_model
+				self.device_platform = orig.device_platform
 
 		# Lógica al cambiar estado
 		# 2 -> Aprobado: guardar fecha y activar estatus

@@ -37,7 +37,7 @@ class Comercio(ModeloBaseGenerico):
 	id_servicio = models.ForeignKey(Servicio, 
 									on_delete=models.PROTECT,
 									null=True, blank=True,
-									verbose_name="Servicio*")
+									verbose_name="Rubro/Servicio*")
 	pago = models.IntegerField("Forma de Pago*", 
 									default=1,
 									choices=PAGO_COMERCIO)
