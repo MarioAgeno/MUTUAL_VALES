@@ -24,6 +24,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     Serializer personalizado que valida también el dispositivo en el login
     """
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["username"] = user.username
+        return token
+
     def validate(self, attrs):
         # Validación normal de credenciales
         data = super().validate(attrs)

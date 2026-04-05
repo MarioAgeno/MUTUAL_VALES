@@ -1,8 +1,18 @@
 """
 Utilidades para validación de dispositivos en Django
 """
+import os
+
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
+
+
+_raw_bypass_users = os.getenv("DEVICE_VALIDATION_BYPASS_USERS", "marioageno")
+DEVICE_VALIDATION_BYPASS_USERS = {
+    username.strip().lower()
+    for username in _raw_bypass_users.split(",")
+    if username.strip()
+}
 
 
 def validar_dispositivo_usuario(user, request, strict=True):
@@ -38,6 +48,13 @@ def validar_dispositivo_usuario(user, request, strict=True):
     print(f"   Device en BD: {user.device_id}")
     print(f"   Modelo recibido: {device_model}")
     print(f"   Strict mode: {strict}")
+
+    username_actual = (getattr(user, "username", "") or "").strip().lower()
+    if username_actual in DEVICE_VALIDATION_BYPASS_USERS:
+        print("   🧪 Bypass tester activo - OMITIENDO validación de dispositivo")
+        user.device_last_used_at = timezone.now()
+        user.save(update_fields=["device_last_used_at"])
+        return
     
     # Si no hay device_id, permitir por retrocompatibilidad
     if not device_id:
