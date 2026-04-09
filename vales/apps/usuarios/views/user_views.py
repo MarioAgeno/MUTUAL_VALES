@@ -10,12 +10,17 @@ from django.contrib.contenttypes.models import ContentType
 
 from django.contrib.auth import authenticate
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
+from django.views import View
+from django.core.exceptions import ObjectDoesNotExist
 
 from .user_views_generics import *
 from apps.usuarios.forms.user_form import *
+from apps.maestros.views.cruds_views_generics import MaestroListView
 
 #from apps.usuarios.models.user_models import User
-from apps.usuarios.models import User
+from apps.usuarios.models import User, DeviceRelinkRequest
 
 
 #-- Indicar las aplicaciones del proyecto para poder filtrar los modelos de las mismas.
@@ -253,4 +258,135 @@ class UsuarioDeleteView(GenericDeleteView):
 		"accion": "Eliminar Usuario",
 		"list_view_name": "usuario_listar"
 	}
+
+
+class StaffRequiredMixin:
+	"""Restringe la gestión de re-vinculación a usuarios staff."""
+
+	def dispatch(self, request, *args, **kwargs):
+		if not request.user.is_authenticated:
+			return redirect('iniciar_sesion')
+		if not request.user.is_staff:
+			messages.error(request, 'No tienes permisos para gestionar solicitudes de re-vinculación.')
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
+
+class DeviceRelinkRequestListView(StaffRequiredMixin, MaestroListView):
+	model = DeviceRelinkRequest
+	template_name = 'usuarios/revinculacion_list.html'
+	context_object_name = 'objetos'
+	search_fields = [
+		'user__username',
+		'old_device_id',
+		'new_device_id',
+		'device_model',
+		'device_platform',
+		'status',
+		'request_ip',
+	]
+	ordering = ['-requested_at']
+
+	def get_queryset(self):
+		queryset = super().get_queryset()
+		status = self.request.GET.get('estado', '').strip()
+		if status in {
+			DeviceRelinkRequest.STATUS_PENDING,
+			DeviceRelinkRequest.STATUS_APPROVED,
+			DeviceRelinkRequest.STATUS_REJECTED,
+		}:
+			queryset = queryset.filter(status=status)
+		return queryset
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context.update({
+			'master_title': 'Solicitudes de Re-vinculación',
+			'home_view_name': 'home',
+			'list_view_name': 'revinculacion_listar',
+			'selected_status': self.request.GET.get('estado', '').strip(),
+			'status_choices': DeviceRelinkRequest.STATUS_CHOICES,
+		})
+		return context
+
+
+def _aprobar_solicitud_revinculacion(relink_request):
+	"""Aplica la re-vinculación aprobada sobre User y Socio si existe relación."""
+	now = timezone.now()
+	user = relink_request.user
+
+	user.device_id = relink_request.new_device_id
+	user.device_model = relink_request.device_model
+	user.device_platform = relink_request.device_platform
+	if not user.device_registered_at:
+		user.device_registered_at = now
+	user.device_last_used_at = now
+	user.save(update_fields=[
+		'device_id',
+		'device_model',
+		'device_platform',
+		'device_registered_at',
+		'device_last_used_at',
+	])
+
+	try:
+		cuenta_socio = user.cuenta_socio
+		socio = cuenta_socio.socio
+
+		socio.device_id = relink_request.new_device_id
+		socio.device_model = relink_request.device_model
+		socio.device_platform = relink_request.device_platform
+		if not socio.device_registered_at:
+			socio.device_registered_at = now
+		socio.device_last_used_at = now
+		socio.save(update_fields=[
+			'device_id',
+			'device_model',
+			'device_platform',
+			'device_registered_at',
+			'device_last_used_at',
+		])
+	except ObjectDoesNotExist:
+		pass
+
+	relink_request.status = DeviceRelinkRequest.STATUS_APPROVED
+	relink_request.resolved_at = now
+	relink_request.resolution_notes = 'Aprobada desde backoffice.'
+	relink_request.save(update_fields=['status', 'resolved_at', 'resolution_notes'])
+
+
+class DeviceRelinkApproveView(StaffRequiredMixin, View):
+	def post(self, request, pk):
+		relink_request = get_object_or_404(DeviceRelinkRequest, pk=pk)
+		if relink_request.status != DeviceRelinkRequest.STATUS_PENDING:
+			messages.warning(request, 'Solo se pueden aprobar solicitudes pendientes.')
+			return redirect('revinculacion_listar')
+
+		_aprobar_solicitud_revinculacion(relink_request)
+		messages.success(request, f'Solicitud #{relink_request.pk} aprobada correctamente.')
+		return redirect('revinculacion_listar')
+
+
+class DeviceRelinkRejectView(StaffRequiredMixin, View):
+	def post(self, request, pk):
+		relink_request = get_object_or_404(DeviceRelinkRequest, pk=pk)
+		if relink_request.status != DeviceRelinkRequest.STATUS_PENDING:
+			messages.warning(request, 'Solo se pueden rechazar solicitudes pendientes.')
+			return redirect('revinculacion_listar')
+
+		relink_request.status = DeviceRelinkRequest.STATUS_REJECTED
+		relink_request.resolved_at = timezone.now()
+		relink_request.resolution_notes = 'Rechazada desde backoffice.'
+		relink_request.save(update_fields=['status', 'resolved_at', 'resolution_notes'])
+
+		messages.success(request, f'Solicitud #{relink_request.pk} rechazada correctamente.')
+		return redirect('revinculacion_listar')
+
+
+class DeviceRelinkDeleteView(StaffRequiredMixin, View):
+	def post(self, request, pk):
+		relink_request = get_object_or_404(DeviceRelinkRequest, pk=pk)
+		relink_request.delete()
+		messages.success(request, f'Solicitud #{pk} eliminada correctamente.')
+		return redirect('revinculacion_listar')
 

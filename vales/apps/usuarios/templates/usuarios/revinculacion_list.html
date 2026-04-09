@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+	{{ master_title }}
+{% endblock title %}
+
+{% block style %}
+	body {
+		background-color: rgb(0, 204, 255);
+	}
+
+	.tbl-fixed {
+		overflow-x: scroll;
+		overflow-y: scroll;
+		height: fit-content;
+		max-height: 60vh;
+		margin-top: 0px;
+		font-size: 80%;
+	}
+
+	table {
+		min-width: max-content;
+	}
+
+	table th {
+		position: sticky;
+		top: 0px;
+	}
+{% endblock style %}
+
+{% block header %}
+	{% include 'top_nav.html' %}
+{% endblock header %}
+
+{% block main %}
+	{% block sidebar %}
+		{% if user.is_authenticated %}
+			{% include 'sidebar.html' %}
+		{% endif %}
+	{% endblock sidebar %}
+
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid tbl-container">
+				<div class="card border-secondary mb-3 mt-2">
+					<div class="card-header bg-primary bg-opacity-25 text-dark d-flex justify-content-between p-1">
+						<h4>{{ master_title }}</h4>
+						<button
+							type="button"
+							class="btn-close btn-close-blue"
+							aria-label="Close"
+							onclick="window.location.href='{% url home_view_name %}'"
+						></button>
+					</div>
+
+					<div class="card-body">
+						{% if messages %}
+							{% for message in messages %}
+								<div class="alert alert-{{ message.tags|default:'info' }} py-2" role="alert">
+									{{ message }}
+								</div>
+							{% endfor %}
+						{% endif %}
+
+						<div class="row g-2 align-items-center">
+							<div class="col-12 col-md-7">
+								{% include 'buscador.html' %}
+							</div>
+							<div class="col-12 col-md-5">
+								<form method="get" action="{% url list_view_name %}" class="d-flex gap-2">
+									<input type="hidden" name="busqueda" value="{{ request.GET.busqueda }}">
+									<input type="hidden" name="paginate_by" value="{{ request.GET.paginate_by|default:selected_pagination }}">
+									<select name="estado" class="form-select" onchange="this.form.submit()">
+										<option value="">Todos los estados</option>
+										{% for value, label in status_choices %}
+											<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+										{% endfor %}
+									</select>
+								</form>
+							</div>
+						</div>
+
+						<div class="row tbl-fixed my-2 mx-1">
+							<table class="table table-bordered table-striped table-hover">
+								<thead class="table-primary">
+									<tr>
+										<th>ID</th>
+										<th>Usuario</th>
+										<th>Estado</th>
+										<th>Dispositivo Anterior</th>
+										<th>Nuevo Dispositivo</th>
+										<th>Plataforma</th>
+										<th>Fecha Solicitud</th>
+										<th class="text-center">Acciones</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for objeto in objetos %}
+										<tr>
+											<td>{{ objeto.id }}</td>
+											<td>{{ objeto.user.username }}</td>
+											<td>
+												{% if objeto.status == 'PENDING' %}
+													<span class="badge bg-warning text-dark">Pendiente</span>
+												{% elif objeto.status == 'APPROVED' %}
+													<span class="badge bg-success">Aprobada</span>
+												{% else %}
+													<span class="badge bg-danger">Rechazada</span>
+												{% endif %}
+											</td>
+											<td>{{ objeto.old_device_id|default:'-' }}</td>
+											<td>{{ objeto.new_device_id }}</td>
+											<td>{{ objeto.device_platform|default:'-' }}</td>
+											<td>{{ objeto.requested_at|date:'d/m/Y H:i' }}</td>
+											<td class="text-center" style="white-space: nowrap;">
+												{% if objeto.status == 'PENDING' %}
+													<form method="post" action="{% url 'revinculacion_aprobar' objeto.pk %}" class="d-inline">
+														{% csrf_token %}
+														<button type="submit" class="btn btn-outline-success btn-sm" title="Aprobar"
+															onclick="return confirm('¿Aprobar solicitud #{{ objeto.id }}?')">
+															<i class="fa fa-check"></i>
+														</button>
+													</form>
+													<form method="post" action="{% url 'revinculacion_rechazar' objeto.pk %}" class="d-inline">
+														{% csrf_token %}
+														<button type="submit" class="btn btn-outline-warning btn-sm" title="Rechazar"
+															onclick="return confirm('¿Rechazar solicitud #{{ objeto.id }}?')">
+															<i class="fa fa-ban"></i>
+														</button>
+													</form>
+												{% endif %}
+												<form method="post" action="{% url 'revinculacion_eliminar' objeto.pk %}" class="d-inline">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-outline-danger btn-sm" title="Eliminar"
+														onclick="return confirm('¿Eliminar solicitud #{{ objeto.id }}? Esta acción no se puede deshacer.')">
+														<i class="fa fa-trash-alt"></i>
+													</button>
+												</form>
+											</td>
+										</tr>
+									{% empty %}
+										<tr>
+											<td colspan="8" class="text-center text-muted">No hay solicitudes de re-vinculación para mostrar.</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+
+						{% include 'paginador.html' %}
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+{% endblock main %}

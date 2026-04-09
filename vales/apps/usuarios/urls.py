@@ -28,6 +28,12 @@ urlpatterns = [
 	path('usuario/editar/<int:pk>/', UsuarioUpdateView.as_view(), name='usuario_editar'),
 	path('usuario/eliminar/<int:pk>/', UsuarioDeleteView.as_view(), name='usuario_eliminar'),
 
+	#-- Re-vinculación de dispositivo (backoffice)
+	path('revinculacion/listar/', DeviceRelinkRequestListView.as_view(), name='revinculacion_listar'),
+	path('revinculacion/aprobar/<int:pk>/', DeviceRelinkApproveView.as_view(), name='revinculacion_aprobar'),
+	path('revinculacion/rechazar/<int:pk>/', DeviceRelinkRejectView.as_view(), name='revinculacion_rechazar'),
+	path('revinculacion/eliminar/<int:pk>/', DeviceRelinkDeleteView.as_view(), name='revinculacion_eliminar'),
+
 	# -- API
     path("registro-socio/", RegistroSocioView.as_view(), name="registro-socio"),
     path("api/token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
