@@ -30,4 +30,24 @@ En Django backoffice solo se gestionan esas solicitudes ya creadas.
 4. Ejecutar Aprobar o Rechazar según corresponda.
 5. Usar Eliminar solo para limpiar solicitudes no necesarias o erróneas.
 
+## Cuentas Comercio (Backoffice)
+
+Las cuentas de socios se crean desde la app movil por API.
+
+Las Cuentas Comercio se gestionan desde Django backoffice por usuarios staff/superuser.
+
+### Ruta
+
+- Listado: `/maestros/cuenta_comercio/`
+- Acceso rapido: menu `Accesos Rapidos -> Cuentas Comercio`
+
+### Operatoria
+
+1. Ingresar a Cuentas Comercio.
+2. Crear una vinculacion nueva entre Usuario y Comercio.
+3. En alta se puede:
+4. Seleccionar usuario existente no vinculado.
+5. Crear usuario nuevo y vincularlo en la misma pantalla.
+6. Editar o eliminar vinculaciones existentes segun necesidad operativa.
+
 
