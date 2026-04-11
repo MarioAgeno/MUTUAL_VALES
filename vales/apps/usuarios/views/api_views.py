@@ -20,6 +20,19 @@ from  ...maestros.models.cuenta_socio_models import CuentaSocio
 User = get_user_model()
 
 
+def _split_full_name(full_name: str) -> tuple[str, str]:
+    """Divide nombre completo en first_name y last_name de forma tolerante."""
+    normalized = " ".join((full_name or "").strip().split())
+    if not normalized:
+        return "", ""
+
+    parts = normalized.split(" ")
+    if len(parts) == 1:
+        return parts[0], ""
+
+    return parts[0], " ".join(parts[1:])
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     Serializer personalizado que valida también el dispositivo en el login
@@ -132,12 +145,29 @@ class RegistroSocioView(APIView):
             )
 
         # 6) Crear usuario
+        raw_first_name = (data.get("first_name") or "").strip()
+        raw_last_name = (data.get("last_name") or "").strip()
+
+        # Fallback: usar nombre aprobado de adhesión o del socio si no llega explícito.
+        if not raw_first_name and not raw_last_name:
+            source_full_name = (
+                solicitud.nombre_solicitud_adhesion
+                or socio.nombre_socio
+                or ""
+            )
+            raw_first_name, raw_last_name = _split_full_name(source_full_name)
+
+        telefono = (data.get("telefono") or data.get("movil") or "").strip()[:15]
+
         user = User.objects.create_user(
             username=data["username"],
             email=data["email"],
             password=data["password"],
             is_active=True,
             id_sucursal_id=1,
+            first_name=raw_first_name[:150],
+            last_name=raw_last_name[:150],
+            telefono=telefono,
         )
         
         # Agregar información del dispositivo si está disponible

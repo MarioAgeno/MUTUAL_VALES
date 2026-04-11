@@ -10,6 +10,9 @@ class RegistroSocioSerializer(serializers.Serializer):
     movil = serializers.CharField(max_length=50)
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True, min_length=6)
+    first_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    last_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    telefono = serializers.CharField(max_length=15, required=False, allow_blank=True)
     
     # Campos de dispositivo (opcionales para retrocompatibilidad)
     device_id = serializers.CharField(max_length=255, required=False, allow_null=True)
