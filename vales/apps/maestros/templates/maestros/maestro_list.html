@@ -78,10 +78,12 @@
 								</div>
 								
 								<div class="col col-2">
-									<a href="{% url create_view_name %}" 
-											class="btn btn-primary opacity-75">
-										Nuevo
-									</a>
+									{% if show_create_button|default:True %}
+										<a href="{% url create_view_name %}" 
+												class="btn btn-primary opacity-75">
+											Nuevo
+										</a>
+									{% endif %}
 								</div>
 							</div>
 							
@@ -90,14 +92,16 @@
 								<table class="table table-bordered table-striped table-hover">
 									<thead class="table-primary">
 										{% for key, value in table_headers.items %}
-											<th class="col-{{ value.0 }}">
-												<a href="{% url list_view_name %}?order_by={{ key }}">
-													{{ value.1 }}
-													{% if key == order_by %}
-														▲
-													{% endif %}
-												</a>
-											</th>
+											{% if key != 'acciones' or show_actions|default:True %}
+												<th class="col-{{ value.0 }}">
+													<a href="{% url list_view_name %}?order_by={{ key }}">
+														{{ value.1 }}
+														{% if key == order_by %}
+															▲
+														{% endif %}
+													</a>
+												</th>
+											{% endif %}
 										{% endfor %}
 									</thead>
 									
@@ -128,31 +132,33 @@
 													{% endwith %}
 												{% endfor %}
 												
-												<td class="text-center" style="padding-left: 0.1rem; padding-right: 0.1rem;">
-													<!-- Botón Actualizar -->
-													<button type="button" class="btn btn-outline-primary btn-sm btn-edit boton-oculto" data-form-index="{{ forloop.counter0 }}"
-															onclick="window.location.href='{% url update_view_name objeto.pk %}'" 
-															data-bs-toggle="tooltip" data-bs-placement="top" title="Actualizar Registro"
-															style="font-size: 70%; padding: 0.1rem 0.3rem;">
-														<i class="fa fa-edit"></i>
-													</button>
-													
-													<!-- Botón Eliminar -->
-													<button type="button" class="btn btn-outline-danger btn-sm btn-delete boton-oculto" 
-															data-bs-toggle="modal" title="Eliminar Registro" data-bs-target="#deleteModal" 
-															data-bs-whatever-url="{% url delete_view_name objeto.pk %}" data-bs-whatever-name="{{ objeto }}"
-															style="font-size: 70%; padding: 0.1rem 0.3rem;">
-														<i class="fa fa-trash-alt"></i>
-													</button>
-													
-													<!-- Botón Ver -->
-													<button type="button" class="btn btn-outline-success btn-sm btn-view boton-oculto"
-															data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Registro"
-															style="font-size: 70%; padding: 0.1rem 0.3rem;">
-														<i class="fa fa-eye"></i>
-													</button>
-													
-												</td>
+												{% if show_actions|default:True %}
+													<td class="text-center" style="padding-left: 0.1rem; padding-right: 0.1rem;">
+														<!-- Botón Actualizar -->
+														<button type="button" class="btn btn-outline-primary btn-sm btn-edit boton-oculto" data-form-index="{{ forloop.counter0 }}"
+																onclick="window.location.href='{% url update_view_name objeto.pk %}'" 
+																data-bs-toggle="tooltip" data-bs-placement="top" title="Actualizar Registro"
+																style="font-size: 70%; padding: 0.1rem 0.3rem;">
+															<i class="fa fa-edit"></i>
+														</button>
+														
+														<!-- Botón Eliminar -->
+														<button type="button" class="btn btn-outline-danger btn-sm btn-delete boton-oculto" 
+																data-bs-toggle="modal" title="Eliminar Registro" data-bs-target="#deleteModal" 
+																data-bs-whatever-url="{% url delete_view_name objeto.pk %}" data-bs-whatever-name="{{ objeto }}"
+																style="font-size: 70%; padding: 0.1rem 0.3rem;">
+															<i class="fa fa-trash-alt"></i>
+														</button>
+														
+														<!-- Botón Ver -->
+														<button type="button" class="btn btn-outline-success btn-sm btn-view boton-oculto"
+																data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Registro"
+																style="font-size: 70%; padding: 0.1rem 0.3rem;">
+															<i class="fa fa-eye"></i>
+														</button>
+														
+													</td>
+												{% endif %}
 											</tr>
 										{% endfor %}
 									</tbody>

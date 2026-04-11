@@ -6,6 +6,7 @@ from ..forms.compra_forms import CompraForm
 from entorno.constantes_base import SOLICITUD_VALE
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils.dateparse import parse_date
 
 
 class ConfigViews():
@@ -98,48 +99,55 @@ class CompraListView(MaestroListView):
 	
 	search_fields = DataViewList.search_fields
 	ordering = DataViewList.ordering
+
+	def _es_usuario_comercio(self):
+		user = self.request.user
+		if not user.is_authenticated:
+			return False
+		if user.is_superuser or user.is_staff:
+			return False
+		return user.groups.filter(name='Comercio').exists()
 	
 	def get_queryset(self):
-		queryset = self.model.objects.all()
-		
-		# Obtener el valor de búsqueda
-		query = self.request.GET.get('busqueda', None)
-		
-		if query:
-			# Crear diccionario inverso para mapear texto a valor
-			estado_dict = {display.lower(): value for value, display in SOLICITUD_VALE}
-			
-			# Dividir la query en palabras
-			palabras = query.lower().split()
-			
-			# Buscar si alguna palabra coincide parcialmente con un estado
-			estado_filtrar = None
-			palabras_busqueda = []
-			for palabra in palabras:
-				estado_encontrado = None
-				for value, display in SOLICITUD_VALE:
-					if len(palabra) >= 3 and display.lower().startswith(palabra):
-						estado_encontrado = value
-						break
-				if estado_encontrado is not None:
-					estado_filtrar = estado_encontrado
-				else:
-					palabras_busqueda.append(palabra)
-			
-			# Aplicar filtro de estado si se encontró
-			if estado_filtrar is not None:
-				queryset = queryset.filter(estado_vale=estado_filtrar)
-			
-			# Aplicar búsqueda en otros campos con las palabras restantes
-			if palabras_busqueda:
-				from django.db.models import Q
-				busqueda_texto = ' '.join(palabras_busqueda)
-				search_conditions = Q()
-				for field in self.search_fields:
-					search_conditions |= Q(**{f"{field}__icontains": busqueda_texto})
-				queryset = queryset.filter(search_conditions)
-		
+		queryset = self.model.objects.select_related('id_socio', 'id_comercio', 'id_plan')
+
+		if self._es_usuario_comercio():
+			cuenta = getattr(self.request.user, 'cuenta_comercio', None)
+			if not cuenta or not cuenta.activo:
+				messages.error(
+					self.request,
+					'No tienes una cuenta de comercio activa para consultar compras.'
+				)
+				return self.model.objects.none()
+			queryset = queryset.filter(id_comercio=cuenta.comercio)
+
+		# Buscador por nombre de socio.
+		busqueda = self.request.GET.get('busqueda', '').strip()
+		if busqueda:
+			queryset = queryset.filter(id_socio__nombre_socio__icontains=busqueda)
+
+		# Filtro por rango de fechas.
+		fecha_desde_raw = self.request.GET.get('fecha_desde', '').strip()
+		fecha_hasta_raw = self.request.GET.get('fecha_hasta', '').strip()
+
+		fecha_desde = parse_date(fecha_desde_raw) if fecha_desde_raw else None
+		fecha_hasta = parse_date(fecha_hasta_raw) if fecha_hasta_raw else None
+
+		if fecha_desde:
+			queryset = queryset.filter(fecha_compra__gte=fecha_desde)
+		if fecha_hasta:
+			queryset = queryset.filter(fecha_compra__lte=fecha_hasta)
+
 		return queryset.order_by(*self.ordering)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		es_comercio = self._es_usuario_comercio()
+		context['show_date_filters'] = True
+		context['show_create_button'] = not es_comercio
+		context['show_actions'] = not es_comercio
+		context['search_placeholder'] = 'Buscar por nombre de socio'
+		return context
 	
 	extra_context = {
 		"master_title": ConfigViews.model._meta.verbose_name_plural,

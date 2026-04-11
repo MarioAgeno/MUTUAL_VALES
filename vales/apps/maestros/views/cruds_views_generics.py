@@ -17,6 +17,17 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 
+COMERCIO_GROUP_NAME = 'Comercio'
+
+
+def _es_usuario_comercio(user):
+	if not user.is_authenticated:
+		return False
+	if user.is_superuser or user.is_staff:
+		return False
+	return user.groups.filter(name=COMERCIO_GROUP_NAME).exists()
+
+
 # -- Vistas Genéricas Basada en Clases -----------------------------------------------
 @method_decorator(login_required, name='dispatch')
 class MaestroListView(ListView):
@@ -59,6 +70,14 @@ class MaestroListView(ListView):
 			queryset = queryset.filter(search_conditions)
 		
 		return queryset.order_by(*self.ordering)
+
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			url_name = request.resolver_match.url_name if request.resolver_match else ''
+			if url_name != 'compra_list':
+				messages.error(request, 'Como Comercio solo puedes acceder al listado de compras.')
+				return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
 		
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -107,6 +126,12 @@ class MaestroListView(ListView):
 @method_decorator(login_required, name='dispatch')
 class MaestroCreateView(PermissionRequiredMixin, CreateView):
 	list_view_name = None
+
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			messages.error(request, 'Como Comercio no tienes permisos para crear registros.')
+			return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
 	
 	def form_valid(self, form):
 		#-- Accede al usuario evaluado.
@@ -154,6 +179,12 @@ class MaestroCreateView(PermissionRequiredMixin, CreateView):
 @method_decorator(login_required, name='dispatch')
 class MaestroUpdateView(PermissionRequiredMixin, UpdateView):
 	list_view_name = None
+
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			messages.error(request, 'Como Comercio no tienes permisos para editar registros.')
+			return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
 	
 	def get_form_kwargs(self):
 		"""
@@ -222,6 +253,12 @@ class MaestroUpdateView(PermissionRequiredMixin, UpdateView):
 @method_decorator(login_required, name='dispatch')
 class MaestroDeleteView(PermissionRequiredMixin, DeleteView):
 	list_view_name = None
+
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			messages.error(request, 'Como Comercio no tienes permisos para eliminar registros.')
+			return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
 	
 	#-- Método que agrega mensaje cuando no tiene permiso de eliminar.
 	def handle_no_permission(self):
@@ -243,6 +280,12 @@ class MaestroDeleteView(PermissionRequiredMixin, DeleteView):
 # ------------------------------------------------------------------------------------
 @method_decorator(login_required, name='dispatch')
 class GenericDetailView(DetailView):
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			messages.error(request, 'Como Comercio no tienes permisos para acceder a esta vista.')
+			return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
+
 	def get_data(self, obj):
 		"""
 		Este método debe ser sobreescrito en la clase hija 
@@ -276,6 +319,12 @@ class MaestroCustomView(PermissionRequiredMixin, View):
 		}
 		context.update(kwargs)
 		return context
+
+	def dispatch(self, request, *args, **kwargs):
+		if _es_usuario_comercio(request.user):
+			messages.error(request, 'Como Comercio no tienes permisos para ejecutar esta acción.')
+			return redirect('compra_list')
+		return super().dispatch(request, *args, **kwargs)
 	
 	def handle_no_permission(self):
 		"""Maneja cuando el usuario no tiene permisos"""

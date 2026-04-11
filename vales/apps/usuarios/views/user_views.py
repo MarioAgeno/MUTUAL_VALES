@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 #from django.contrib.auth.decorators import login_required
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -26,6 +26,37 @@ from apps.usuarios.models import User, DeviceRelinkRequest
 #-- Indicar las aplicaciones del proyecto para poder filtrar los modelos de las mismas.
 project_app_labels = ['usuarios', 'maestros', 'ventas']
 
+ADMIN_GROUP_NAMES = {'Administracion', 'Administración'}
+COMERCIO_GROUP_NAME = 'Comercio'
+
+
+def _es_admin_web(user):
+	if user.is_superuser or user.is_staff:
+		return True
+	return user.groups.filter(name__in=ADMIN_GROUP_NAMES).exists()
+
+
+def _es_usuario_comercio(user):
+	if not user.is_authenticated:
+		return False
+	if _es_admin_web(user):
+		return False
+	return user.groups.filter(name=COMERCIO_GROUP_NAME).exists()
+
+
+class AdminWebRequiredMixin:
+	"""Permite acceso solo a administracion web."""
+
+	def dispatch(self, request, *args, **kwargs):
+		if not request.user.is_authenticated:
+			return redirect('iniciar_sesion')
+		if not _es_admin_web(request.user):
+			messages.error(request, 'No tienes permisos para acceder a esta sección.')
+			if _es_usuario_comercio(request.user):
+				return redirect('compra_list')
+			return redirect('home')
+		return super().dispatch(request, *args, **kwargs)
+
 
 #-- Vista Login. 
 class CustomLoginView(GenericLoginView):
@@ -37,6 +68,14 @@ class CustomLoginView(GenericLoginView):
 		
 		#-- Obtener el usuario autenticado.
 		user = form.get_user()
+
+		#-- Solo Administracion o Comercio pueden ingresar al backoffice.
+		es_admin = _es_admin_web(user)
+		es_comercio = _es_usuario_comercio(user)
+		if not es_admin and not es_comercio:
+			logout(self.request)
+			messages.error(self.request, 'Tu usuario no tiene permisos para ingresar al sistema web.')
+			return redirect('iniciar_sesion')
 		
 		#-- Guardar los datos del usuario en la sesión.
 		self.request.session['username'] = user.username
@@ -45,6 +84,11 @@ class CustomLoginView(GenericLoginView):
 		self.request.session['is_superuser'] = user.is_superuser
 		self.request.session['is_staff'] = user.is_staff
 		self.request.session['sucursal'] = user.id_sucursal.nombre_sucursal
+		self.request.session['user_group'] = COMERCIO_GROUP_NAME if es_comercio else 'Administracion'
+
+		#-- Comercio accede solo al listado de compras.
+		if es_comercio:
+			return redirect('compra_list')
 		
 		return response
 	
@@ -93,13 +137,14 @@ class CustomLogoutView(GenericLogoutView):
 			request.session.pop('is_superuser', None)
 			request.session.pop('is_staff', None)
 			request.session.pop('sucursal', None)
+			request.session.pop('user_group', None)
 		 
 		#-- Llama al método original para cerrar la sesión.
 		return super().dispatch(request, *args, **kwargs)
 
 #-- Vistas de Grupos de usuarios. 
 #@method_decorator(login_required, name='dispatch')
-class GrupoListView(GenericListView):
+class GrupoListView(AdminWebRequiredMixin, GenericListView):
 	model = Group
 	context_object_name = 'grupos'
 	template_name = "usuarios/grupo_list.html"
@@ -110,7 +155,7 @@ class GrupoListView(GenericListView):
 
 
 #@method_decorator(login_required, name='dispatch')
-class GrupoCreateView(GenericCreateView):
+class GrupoCreateView(AdminWebRequiredMixin, GenericCreateView):
 	model = Group
 	form_class = GroupForm
 	template_name = "usuarios/grupo_form.html"
@@ -122,7 +167,7 @@ class GrupoCreateView(GenericCreateView):
 
 
 #@method_decorator(login_required, name='dispatch')
-class GrupoUpdateView(GenericUpdateView):
+class GrupoUpdateView(AdminWebRequiredMixin, GenericUpdateView):
 	model = Group
 	form_class = GroupForm
 	template_name = "usuarios/grupo_form.html"
@@ -164,7 +209,7 @@ class GrupoUpdateView(GenericUpdateView):
 
 
 #@method_decorator(login_required, name='dispatch')
-class GrupoDeleteView(GenericDeleteView):
+class GrupoDeleteView(AdminWebRequiredMixin, GenericDeleteView):
 	model = Group
 	template_name = "usuarios/grupo_confirm_delete.html"
 	success_url = reverse_lazy("grupo_listar") # Nombre de la url.
@@ -176,7 +221,7 @@ class GrupoDeleteView(GenericDeleteView):
 
 #-- Vistas de Usuarios.
 #@method_decorator(login_required, name='dispatch')
-class UsuarioListView(GenericListView):
+class UsuarioListView(AdminWebRequiredMixin, GenericListView):
 	model = User
 	context_object_name = 'usuarios'
 	template_name = "usuarios/usuario_list.html"
@@ -187,7 +232,7 @@ class UsuarioListView(GenericListView):
 
 
 #@method_decorator(login_required, name='dispatch')
-class UsuarioCreateView(GenericCreateView):
+class UsuarioCreateView(AdminWebRequiredMixin, GenericCreateView):
 	model = User
 	form_class = RegistroUsuarioForm
 	template_name = "usuarios/usuario_crear_form.html"
@@ -199,7 +244,7 @@ class UsuarioCreateView(GenericCreateView):
 
 
 #@method_decorator(login_required, name='dispatch')
-class UsuarioUpdateView(GenericUpdateView):
+class UsuarioUpdateView(AdminWebRequiredMixin, GenericUpdateView):
 	model = User
 	form_class = EditarUsuarioForm
 	template_name = "usuarios/usuario_editar_form.html"
@@ -250,7 +295,7 @@ class UsuarioUpdateView(GenericUpdateView):
 		return response	
 	
 #@method_decorator(login_required, name='dispatch')
-class UsuarioDeleteView(GenericDeleteView):
+class UsuarioDeleteView(AdminWebRequiredMixin, GenericDeleteView):
 	model = User
 	template_name = "usuarios/usuario_confirm_delete.html"
 	success_url = reverse_lazy("usuario_listar") # Nombre de la url.
@@ -266,8 +311,10 @@ class StaffRequiredMixin:
 	def dispatch(self, request, *args, **kwargs):
 		if not request.user.is_authenticated:
 			return redirect('iniciar_sesion')
-		if not request.user.is_staff:
+		if not _es_admin_web(request.user):
 			messages.error(request, 'No tienes permisos para gestionar solicitudes de re-vinculación.')
+			if _es_usuario_comercio(request.user):
+				return redirect('compra_list')
 			return redirect('home')
 		return super().dispatch(request, *args, **kwargs)
 
