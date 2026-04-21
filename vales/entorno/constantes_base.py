@@ -52,4 +52,5 @@ SOLICITUD_VALE = [
 	(2, 'Aprobado'),
 	(3, 'Rechazado'),
     (4, 'Consumido'),
+    (5, 'Procesado'),
 ]
